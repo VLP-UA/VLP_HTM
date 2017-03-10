@@ -1,3 +1,8 @@
+%% Computation of illumination by a set of light sources
+% 
+% The set of light sources is defined in a structure array with fields name
+% (optional) and HTM (the homogenous transformation matrix)
+
 
 addpath('../ProjGeom/');
 
@@ -12,46 +17,58 @@ dx = .05;
 dy = .05;
 
 % Emitter position and orientation: 
-HTM_E1 = Trans3(Lx/2, Ly/4, Lz);
-HTM_E1 = HTM_E1 * RotX3(pi+pi/12) * RotY3(pi/12);
+HTM_E1 = Trans3(Lx/6, Ly/6, Lz);
+HTM_E1 = HTM_E1 * RotX3(pi);
+% Tilt the emitters
+%HTM_E1 = HTM_E1 * RotX3(pi/12) * RotY3(pi/12);
 
-HTM_E2 = Trans3(0,Ly/2,0) * HTM_E1;
+Emitters(1).HTM = HTM_E1;
+Emitters(2).HTM = Trans3(0,2*Ly/3,0) * HTM_E1;
+Emitters(3).HTM = Trans3(2*Lx/3,0,0) * HTM_E1;
+Emitters(4).HTM = Trans3(2*Lx/3,2*Ly/3,0) * HTM_E1;
 
 % - m (Lambertian mode number)
 % - Ar (receiver area) 
-m = 100;
+m = 1;
 Ar = 1e-4;
 
 
 xvals = 0:dx:Lx;
 yvals = 0:dy:Ly;
 
-rec_power = zeros(numel(xvals),numel(yvals));
+rec_power = zeros(numel(yvals),numel(xvals));
 
-% Compute values 
+%% Compute values 
 for ix = 1:numel(xvals)
     for iy = 1:numel(xvals)
         % Compute receiver position
         HTM_R = Trans3(xvals(ix),yvals(iy),0);
         
-        % Compute received power
-        rp1 = H0_ER(HTM_E1, HTM_R, m, Ar);
-        rp2 = H0_ER(HTM_E2, HTM_R, m, Ar);
+        rp = 0;
+        % for all emitters
+        for e = Emitters
+            % Compute received power
+            rp = rp + H0_ER(e.HTM, HTM_R, m, Ar);
+        end
         
         % Store received power
         % Note: the triples for surf(X,Y,Z) are defined as 
         % ( X(j), Y(i), Z(i,j) )
         % see doc surf
-        rec_power(iy,ix) = rp1 + rp2;
+        rec_power(iy,ix) = rp;
     end
 end
 
-% Show the results
+%% Show the results
+
 figure
-plot3Drefaxis(HTM_E1)
-axis equal
-hold
-plot3Drefaxis(HTM_E2)
+
+% Plot the light sources HTM reference frames
+for e = Emitters
+    plot3Drefaxis(e.HTM)
+    hold on
+    axis equal
+end
 
 h = surf(xvals,yvals,rec_power);
 h.MeshStyle = 'none';
