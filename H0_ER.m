@@ -45,6 +45,12 @@ P_r = HTM_R(1:3,4);
 n_e = HTM_E(1:3,3);
 n_r = HTM_R(1:3,3);
 
+% Receiver and emitter must be facing each other
+if dot(n_e,n_r) > 0
+    H = 0;
+    return
+end
+
 % Compute distance from emitter to receiver
 d = norm(P_e - P_r);
 
@@ -84,7 +90,11 @@ else
     T = 1; 
 end
 
-H = (m+1)/(2*pi)*Ar*T*g*dot(n_e,u)*dot(n_r,-u)/d^2;
+H = (m+1)/(2*pi)*Ar*T*g*(dot(n_e,u)^m)*dot(n_r,-u)/d^2;
+
+if H<0
+    H=0;
+end
 
 end
 
