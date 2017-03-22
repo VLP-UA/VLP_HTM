@@ -1,8 +1,8 @@
 function [ H ] = H0_ER( HTM_E, HTM_R, m, Ar, varargin )
 % H0_ER( HTM_E, HTM_R, m, Ar ) 
 % H0_ER( HTM_E, HTM_R, m, Ar, FOV ) 
-% H0_ER( HTM_E, HTM_R, m, Ar, @g ) 
-% H0_ER( HTM_E, HTM_R, m, Ar, @g, @T ) 
+% H0_ER( HTM_E, HTM_R, m, Ar, FOV, n ) 
+% H0_ER( HTM_E, HTM_R, m, Ar, FOV, n, Ts ) 
 %
 %   OWC channel gain 
 %
@@ -15,17 +15,21 @@ function [ H ] = H0_ER( HTM_E, HTM_R, m, Ar, varargin )
 %   emitter and receiver are aligned with the respective z axis.
 %
 %   m is the Lambertian order of the emitter, Ar the sensor area at the
-%   receiver; FOV is the semi-angle for the Field of View; g and T are,
-%   respectively, the gain and filter at the receiver.
+%   receiver; FOV is the semi-angle for the Field of View; n is the
+%   internal refractive index of the receiver; Ts is the signal
+%   transmission gain of the filter. 
 %
-%   If g and T are ommitted, they default to 1. 
+%   If FOV is omitted, it defaults to pi/2; if n is omitted, no
+%   concentrator gain is considered, and the FOV is defined by obstructing
+%   the field of view; if Ts is omitted, it defaults to 1. 
 %
 %   HTM_E : HTM with position and orientation of emitter;
 %   HTM_R : HTM with position and orientation of receiver;
 %   m : Lambertian mode number of emitter; 
 %   Ar : area of receiver detection surface;
-%   g : gain of optical concentrator;
-%   T : optical filter transfer function
+%   FOV : semi-angle for field of view;
+%   n : refractive index of non-imaging optical concentrator;
+%   Ts : optical filter gain.
 %
 %   [1] F. R. Gfeller and U. Bapst, ‘Wireless in-house data communication 
 %   via diffuse infrared radiation’, Proceedings of the IEEE, vol. 67, no. 
@@ -35,9 +39,9 @@ function [ H ] = H0_ER( HTM_E, HTM_R, m, Ar, varargin )
 %   wireless optical channels’, IEEE Journal on Selected Areas in 
 %   Communications, vol. 11, no. 3, pp. 367–379, Apr. 1993.
 
-% TODO : acrescentar FOV
+narginchk(4,7);
 
-% Get emiiter and receiver position
+% Get emitter and receiver position
 P_e = HTM_E(1:3,4);
 P_r = HTM_R(1:3,4);
 
@@ -47,6 +51,7 @@ n_r = HTM_R(1:3,3);
 
 % Receiver and emitter must be facing each other
 if dot(n_e,n_r) > 0
+    % not facing...
     H = 0;
     return
 end
@@ -57,40 +62,37 @@ d = norm(P_e - P_r);
 % Compute u, the versor in the direction P_e to P_r: 
 u = (P_r - P_e)/d;
 
-% Check 5th argument
+% Default values
+g = 1; 
+Ts = 1; 
+
+% Check 5th argument: FOV
 if nargin > 4 
     % incidence angle must be computed
     Theta = acos(dot(n_r,-u));
 
-    gf = varargin{1};
-    % Check if 5th argument is a function handle or a numerical value
-    if isa(gf,'function_handle') 
-        % Gain is defined by a function
-        g = gf(Theta);
-    else
-        % A FOV was defined
-        g = rectangularPulse(-gf,gf,Theta);
+    FOV = varargin{1};
+    
+    % Check for 6th argument: n
+    if nargin > 5
+        % A non-imaging is considered
+        % n is the internal refractive index of the non-imaging
+        % concentrator
+        n = varargin{2};
+        g = (n / sin(FOV) )^2;
     end
-
-    % Check 6th argument
-    if nargin == 6
-        Tf = varargin{2};
-        if isa(Tf,'function_handle')
-            % Filter is defined by a function
-            T = Tf(Theta);
-        else
-            % The filter is defined by a constant
-            T = Tf;
-        end
-    else
-        T = 1;
+    
+    % restrict to the FOV
+    g = g*rectangularPulse(-FOV,FOV,Theta);
+    
+    % Check 7th argument: Ts (filter gain)
+    if nargin == 7
+        Ts = varargin{3};
     end
-else
-    g = 1; 
-    T = 1; 
 end
 
-H = (m+1)/(2*pi)*Ar*T*g*(dot(n_e,u)^m)*dot(n_r,-u)/d^2;
+
+H = (m+1)/(2*pi)*Ar*Ts*g*(dot(n_e,u)^m)*dot(n_r,-u)/d^2;
 
 if H<0
     H=0;

@@ -10,7 +10,7 @@ addpath('../ProjGeom/');
 
 % - m (Lambertian mode number)
 % - Ar (receiver area) 
-m = 0;
+m = 1;
 Ar = 1e-4;
 
 % Emitter position and orientation: 

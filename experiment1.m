@@ -17,7 +17,7 @@ HTM_E = HTM_E * RotY3(pi+pi/8);
 
 % - m (Lambertian mode number)
 % - Ar (receiver area) 
-m = 100;
+m = 2;
 Ar = 1e-4;
 
 
@@ -50,5 +50,5 @@ hold
 
 h = surf(xvals,yvals,rec_power);
 h.MeshStyle = 'none';
-view(2);
+% view(2);
 figure(gcf);
