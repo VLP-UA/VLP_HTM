@@ -1,7 +1,7 @@
 function [ A ] = Receiver2A ( Receivers )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
-
+%[ A ] = Receiver2A ( Receivers ) Computes the A matrix from an array of
+% receivers struct data
+%
 % A: matrix with receiver data
 % a_{ij} = A_{r,i} T_{s,i} \frac{n_i^2}{\sin^2(\Psi_{c,i})}, i=j
 
@@ -15,9 +15,7 @@ Av = [Receivers(:).Ar].*[Receivers(:).Ts].*([Receivers(:).n].*sin([Receivers(:).
 % A = diag(Av);
 % Better use a sparse matrix:
 mv = numel(Av);
-% Create the diagonal matrix using a sparse matrix:
 A = sparse(1:mv,1:mv,Av);
-
 
 end
 

@@ -1,6 +1,7 @@
 function [ F ] = EmitRec2F( Emitters, Receivers )
 %EmitRec2F Compute the F matrix from emitter and receiver data.
-%   Detailed explanation goes here
+% 
+% Emitter and receiver data are stored in struct arrays.
 
 % Extract the position and orientation vectors from the HTMs
 
