@@ -6,7 +6,9 @@ function [ A ] = Receiver2A ( Receivers )
 % a_{ij} = A_{r,i} T_{s,i} \frac{n_i^2}{\sin^2(\Psi_{c,i})}, i=j
 
 % Av is a vector with the a_j terms
-Av = [Receivers(:).Ar].*[Receivers(:).Ts].*([Receivers(:).n].*sin([Receivers(:).Psi]).^2);
+% Erro?
+% Av = [Receivers(:).Ar].*[Receivers(:).Ts].*([Receivers(:).n].*sin([Receivers(:).Psi]).^2);
+Av = [Receivers(:).Ar].*[Receivers(:).Ts].*([Receivers(:).n]./sin([Receivers(:).Psi])).^2;
 
 % Compute the diagonal matrix with receiver data. 
 %

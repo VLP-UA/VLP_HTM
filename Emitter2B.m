@@ -1,5 +1,7 @@
 function [ B ] = Emitter2B( Emitters )
 %Emitter2B    Compute B matrix from emitters data
+% B = Emitter2B(Emitters) is a diagonal matrix with emitter data. Emitters
+% is a struct array with the emitters description
 % B: matrix with emitter data
 % $b_{ij} = \frac{m_j+1}{2\pi} ~ \delta_{ij}$ 
 

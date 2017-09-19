@@ -4,7 +4,7 @@
 
 clear t 
 
-delta = [0.5 0.2 0.1 0.05 0.02 0.01 0.005 0.002 ]
+delta = [0.5 0.2 0.1 0.05 ] % 0.02 0.01 0.005 0.002 ]
 
 for ind=1:numel(delta)
     
@@ -40,7 +40,7 @@ end
 % to contains the time per each operation
 to = [ t(1,:)
     diff(t)
-    sum(to) ]
+    t(4,:) ]
 
 figure
 plot((Lx./delta).^2,to,'*-')

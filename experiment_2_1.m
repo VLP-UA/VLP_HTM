@@ -7,7 +7,7 @@
 % A: matrix with receiver data
 
 % a_{ij} = A_{r,i} T_{s,i} \frac{n_i^2}{\sin^2(\Psi_{c,i})}
-Av = [Receivers(:).Ar].*[Receivers(:).Ts].*([Receivers(:).n].*sin([Receivers(:).Psi]).^2);
+Av = [Receivers(:).Ar].*[Receivers(:).Ts].*([Receivers(:).n]./sin([Receivers(:).Psi])).^2;
 
 % Compute the diagonal matrix with receiver data. 
 %
