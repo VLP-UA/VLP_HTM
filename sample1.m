@@ -1,5 +1,5 @@
-%% Sample code to demonstrate the usage the code for applying HTM matrices to VLP
-%
+%% Sample code to demonstrate H0_ER function usage
+
 % This code uses the Projective Geometry functions.
 
 addpath('../ProjGeom/');
@@ -25,12 +25,14 @@ H0_ER(HTM_E, HTM_R, m, Ar)
 
 %% Same as above, g is specificied as rect(). Defines a FOV
 
-H0_ER(HTM_E, HTM_R, m, Ar, @g)
+% H0_ER(HTM_E, HTM_R, m, Ar, @g)
+% Deprecated; H0_ER does not use function pointers
 
 % Move to a region where emitter is outside the FOV. Output should be zero
 
 HTM_R = Trans3(0,5,0);
-H0_ER(HTM_E, HTM_R, m, Ar, @g)
+% H0_ER(HTM_E, HTM_R, m, Ar, @g)
+% Deprecated; H0_ER does not use function pointers
 
 % Calling H0_ER with a explicit FOV
 FOV = pi/6;

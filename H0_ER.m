@@ -1,8 +1,10 @@
 function [ H ] = H0_ER( HTM_E, HTM_R, m, Ar, varargin )
-% H0_ER( HTM_E, HTM_R, m, Ar ) 
-% H0_ER( HTM_E, HTM_R, m, Ar, FOV ) 
-% H0_ER( HTM_E, HTM_R, m, Ar, FOV, n ) 
-% H0_ER( HTM_E, HTM_R, m, Ar, FOV, n, Ts ) 
+%H0_ER Compute OWC channel gain
+%
+%   H0_ER( HTM_E, HTM_R, m, Ar ) 
+%   H0_ER( HTM_E, HTM_R, m, Ar, FOV ) 
+%   H0_ER( HTM_E, HTM_R, m, Ar, FOV, n ) 
+%   H0_ER( HTM_E, HTM_R, m, Ar, FOV, n, Ts ) 
 %
 %   OWC channel gain 
 %

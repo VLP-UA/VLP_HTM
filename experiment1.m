@@ -1,3 +1,4 @@
+%EXPERIMENT1 Plot of power received in the plane from a source using H0_ER
 
 addpath('../ProjGeom/');
 

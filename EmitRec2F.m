@@ -1,5 +1,5 @@
 function [ F ] = EmitRec2F( Emitters, Receivers )
-%EmitRec2F Compute the F matrix from emitter and receiver data.
+%EMITREC2F Compute the F matrix from emitter and receiver data.
 % 
 % Emitter and receiver data are stored in struct arrays.
 

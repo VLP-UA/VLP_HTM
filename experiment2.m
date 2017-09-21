@@ -1,7 +1,8 @@
-%% Experiment 2
+
+% Plot radiation graph from Lambertian source using H0_ER
 %
-% Plot of intensity as a function of irradiance angle (angle with the
-% emitter axis) for a Lambertian emitter of order m
+%   Plot of intensity as a function of irradiance angle (angle with the
+%   emitter axis) for a Lambertian emitter of order m
 
 
 addpath('../ProjGeom/');
