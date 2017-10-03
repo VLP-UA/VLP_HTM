@@ -26,7 +26,7 @@ function SensorArray = vlpCreateSensorParMer(PDArray, NParal,NMerid, r, varargin
 %   The user must guarantee that the number of receivers in PDArray
 %   corresponds to NParal*NMerid
 %
-%   PDArray can be created with newReceivers()
+%   See also NEWRECEIVERS
 
 if(numel(PDArray) ~= NParal*NMerid)
     error('Size of PDArray does not correspond to NParal*NMerid');
