@@ -14,15 +14,7 @@ function [ Emitters ] = CreateEmittersArray( nx, ny, Pt, m, Lx, Ly, Z )
 
 n_Emitters = nx * ny; 
 
-% Create the receiver structure:
-Emitter_t = struct('HTM',{},'Pt',{},'m',{});
-
-% Create one element with default values
-Emitter_t(1).Pt = Pt;
-Emitter_t(1).m = m;
-
-% Replicate to create the receivers array:
-Emitters = repmat(Emitter_t,1,n_Emitters);
+Emitters = newEmitters(n_Emitters, Pt, m);
 
 if (size(Z) == [1 1] )
     % No base HTM provided.

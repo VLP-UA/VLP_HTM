@@ -6,24 +6,13 @@ function [ Receivers ] = CreateReceiversArray( nx, ny, Ar, Ts, n, Psi, Lx, Ly )
 %   nx, ny      - dimension (in number) of the array on x and y directions
 %   Ar          - receiver's sensing area
 %   Ts          - receiver filter gain
-%   n           - 
+%   n           - receiver's internal refractive index
 %   Psi         - Hemi-FOV
 %   Lx, Ly      - physical dimensions (length and width) of the array.
 
 n_Receivers = nx * ny;
 
-% Create the receiver structure:
-Receiver_t = struct('HTM',{},'Ar',{},'Ts',{},'n',{},'Psi',{},'Pr',{});
-
-% Create one element with default values
-Receiver_t(1).Ar = Ar;
-Receiver_t(1).Ts = Ts;
-Receiver_t(1).n = n;
-Receiver_t(1).Psi = Psi;
-Receiver_t(1).Pr = 0;
-
-% Replicate to create the receivers array:
-Receivers = repmat(Receiver_t,1,n_Receivers);
+Receivers = newReceivers(n_Receivers, Ar, Ts, n, Psi);
 
 % Base position is at (0,0,0), looking up (no change in the axis
 % orientation)
