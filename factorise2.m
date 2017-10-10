@@ -1,4 +1,4 @@
-function [ a b ] = factorise2( n )
+function [ a , b ] = factorise2( n )
 %FACTORISE2 Computes two factors that, multiplied, result in n
 %
 

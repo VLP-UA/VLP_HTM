@@ -44,7 +44,6 @@ elseif (nargin == 0)
     Ts = [];
 else
     error('Incorrect number of arguments.');
-    return;
 end
 
 % Create the receiver structure:

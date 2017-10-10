@@ -24,7 +24,7 @@ n_Receivers = Np*Nm;    % Number of receivers
 Ar = 0.01;              % Active receiving area
 Ts = 1;                 % Optical filter gain
 n = 1;                  % Receiver's internal refractive index
-Psi = pi/6;             % Hemi-Fov
+Psi = pi/4;             % Hemi-Fov
 
 
 
@@ -83,7 +83,9 @@ k = 0.2;
 
 % Plot the emitters and receivers position
 if(isgraphics(1))
-    close(1)
+    clf(1)
+else
+    figure(1)
 end
 figure(1)
 PlotHTMArray(Emitters);
@@ -96,7 +98,9 @@ view(-38,8);
 
 % Plot with received power intensity
 if(isgraphics(2))
-    close(2)
+    clf(2)
+else
+    figure(2)
 end
 figure(2)
 PlotHTMArray(Emitters);
@@ -107,7 +111,7 @@ grid on
 
 % Move the sensor, compute new received power and plot received power
 % intensity
-for i=1:3
+for position=1:3
     PDSensor = vlpMoveSensor(PDSensor,Trans3(1,-1,0));
     % Recompute the F matrix
     F = EmitRec2F(Emitters, PDSensor);

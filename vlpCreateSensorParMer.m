@@ -64,21 +64,21 @@ SensorArray = PDArray;
 % The following cycles compute the elevation and azimuth angles and adjust
 % the sensors orientation
 for m = 0:NMerid-1
-	for p = 0:NParal-1
+    for p = 0:NParal-1
         
-        index = m*NParal + (p+1); 
+        index = m*NParal + (p+1);
         
         % Compute azimuth and elevation
-		azimuth = PMerid + m*2*pi/NMerid;
-		elevation = PParal + (p*(pi/2-PParal))/NParal;
+        azimuth = PMerid + m*2*pi/NMerid;
+        elevation = PParal + (p*(pi/2-PParal))/NParal;
         
-        % Rotate base HTM. 
+        % Rotate base HTM.
         % Base HTM is rotated by:
         % - the azimuth angle along Z axis (base coords)
-        % - the elevation angle along base HTM's y axis 
+        % - the elevation angle along base HTM's y axis
         % Finally, the HTM is translated by distance r over z (sensor frame) axis
         SensorArray(index).HTM = RotZ3(azimuth)*Base_HTM*RotY3(elevation)*Trans3(0,0,r);
-
+        
     end
 end
 

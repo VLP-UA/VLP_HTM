@@ -12,6 +12,6 @@ function [ Emitters ] = CreateEmittersArray2( n_Emitters, Pt, m, Lx, Ly, Z )
 %   height Z, looking down (i.e., with z axis pointing downwards) when Z is
 %   a real value or placed starting at the location defined by the HTM Z.
 
-[ nx ny ] = factorise2(n_Emitters);
+[ nx , ny ] = factorise2(n_Emitters);
 
 Emitters = CreateEmittersArray(nx, ny, Pt, m, Lx, Ly, Z);
