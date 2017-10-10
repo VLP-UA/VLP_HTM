@@ -22,6 +22,9 @@
 %   CreateReceiversArray  - Creates a regularly spaced array of nx x ny receivers in a area of Lx x Ly
 %   CreateReceiversArray2 - Creates a regularly spaced array of n_Receivers receivers in a area of Lx x Ly
 %
+%   Sensors
+%   vlpCreateSensorParMer - Creates a VLP sensor with parallels and meridians
+%
 %   Demos:
 %   demo1                 - Demonstrates the usage of HTM based VLP code
 %   DefineSpace           - Define variables for the simulation space

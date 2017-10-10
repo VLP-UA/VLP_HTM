@@ -1,4 +1,9 @@
 % Demonstrates the usage of HTM based VLP code
+% 
+% The script will create an array of emitters and a VLP sensor.
+%
+% It then plots the received intensity at the sensor when the sensor is
+% displaced.
 
 %% Prepare the workspace
 
@@ -13,8 +18,8 @@ Pt = 1 ;                % Transmitted power
 m = 5 ;                 % Lambertian mode number
 
 % Receivers:
-Np = 10;                % Number of parallels in the sensor
-Nm = 10;                % Number of meridians in the sensor
+Np = 5;                % Number of parallels in the sensor
+Nm = 6;                % Number of meridians in the sensor
 n_Receivers = Np*Nm;    % Number of receivers
 Ar = 0.01;              % Active receiving area
 Ts = 1;                 % Optical filter gain
@@ -49,8 +54,8 @@ Emitters(3).HTM = Em_Base_HTM*RotZ3(4*pi/3)*Trans3(0.5,0,0);
 % radius=0.25
 PDSensor = vlpCreateSensorParMer(Receivers, Np, Nm, 0.25);
 
-% The sensor is place at point (X,Y) = (0.5,0)
-PDSensor = vlpMoveSensor(PDSensor,Trans3(0.5,0,0));
+% The sensor is initially placed at point (X,Y) = (0.5,3)
+PDSensor = vlpMoveSensor(PDSensor,Trans3(0.5,3,0));
 
 %% Compute A, B and F matrices
 
@@ -63,20 +68,65 @@ F = EmitRec2F(Emitters, PDSensor);
 Pt_v = [Emitters.Pt]';
 Pr = A*F*B*Pt_v;
 
+% Get the max value. It will be used for scaling the received power
+% graphics
+MaxPr0 = max(Pr);
+
 % Update the PDSensor received power
 for i=1:numel(PDSensor)
     PDSensor(i).Pr = Pr(i);
 end
 
+k = 0.2;
 
 %% Plot Emitters and receivers
 
 % Plot the emitters and receivers position
-figure;
+if(isgraphics(1))
+    close(1)
+end
+figure(1)
 PlotHTMArray(Emitters);
 PlotHTMArray(PDSensor);
-return
+view(3)
+axis 'equal'
+grid on
+% Adjust the point of view
+view(-38,8);
+
 % Plot with received power intensity
-figure
+if(isgraphics(2))
+    close(2)
+end
+figure(2)
 PlotHTMArray(Emitters);
-PlotHTMArrayPr(PDSensor);
+PlotHTMArrayPr(PDSensor,k);
+view(3)
+axis 'equal'
+grid on
+
+% Move the sensor, compute new received power and plot received power
+% intensity
+for i=1:3
+    PDSensor = vlpMoveSensor(PDSensor,Trans3(1,-1,0));
+    % Recompute the F matrix
+    F = EmitRec2F(Emitters, PDSensor);
+    
+    % Compute received power
+    Pt_v = [Emitters.Pt]';
+    Pr = A*F*B*Pt_v;
+
+    % Get the new max valuefor scaling the received power plot
+    MaxPr = max(Pr);
+
+    % Update the PDSensor received power
+    for i=1:numel(PDSensor)
+        PDSensor(i).Pr = Pr(i);
+    end
+    
+    % Plot the receiver power intensities, scaled
+    PlotHTMArrayPr(PDSensor,k*MaxPr/MaxPr0);
+
+end
+% Adjust the view in figure 2
+view(-54,12);
