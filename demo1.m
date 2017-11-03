@@ -24,6 +24,7 @@ n_Receivers = Np*Nm;    % Number of receivers
 Ar = 0.01;              % Active receiving area
 Ts = 1;                 % Optical filter gain
 n = 1;                  % Receiver's internal refractive index
+R = 1;                  % Receiver's responsivity
 Psi = pi/4;             % Hemi-Fov
 
 
@@ -34,7 +35,7 @@ Psi = pi/4;             % Hemi-Fov
 Emitters = newEmitters(n_Emitters,Pt, m);
 
 % Create the receiver structure:
-Receivers = newReceivers(n_Receivers,Ar, Ts, n, Psi);
+Receivers = newReceivers(n_Receivers,Ar, Ts, n, Psi, R);
 
 %% Place emitters and receivers in 3D space
 

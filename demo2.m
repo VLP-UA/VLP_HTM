@@ -18,16 +18,17 @@ addpath('../ProjGeom');
 % Emitters
 n_Emitters = 3;         % Number of emitters
 Pt = 1 ;                % Transmitted power
-m = 5 ;                 % Lambertian mode number
+m = 4;                  % Lambertian mode number
 
 % Receivers:
-Np = 5;                % Number of parallels in the sensor
-Nm = 6;                % Number of meridians in the sensor
+Np = 5;                 % Number of parallels in the sensor
+Nm = 6;                 % Number of meridians in the sensor
 n_Receivers = Np*Nm;    % Number of receivers
 Ar = 0.01;              % Active receiving area
 Ts = 1;                 % Optical filter gain
 n = 1;                  % Receiver's internal refractive index
-Psi = pi/8;             % Hemi-Fov
+Psi = pi/2;             % Hemi-Fov
+R = 1;                  % Receiver's responsivity
 
 
 
@@ -37,7 +38,7 @@ Psi = pi/8;             % Hemi-Fov
 Emitters = newEmitters(n_Emitters,Pt, m);
 
 % Create the receiver structure:
-Receivers = newReceivers(n_Receivers,Ar, Ts, n, Psi);
+Receivers = newReceivers(n_Receivers,Ar, Ts, n, Psi, R);
 
 %% Place emitters and receivers in 3D space
 

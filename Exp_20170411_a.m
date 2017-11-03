@@ -19,6 +19,7 @@ m = 10;
 Ts = 1;
 n = 1;
 Psi = pi/2;
+R = 1;
 
 ind = 0;
 for n_E = n_Ev
@@ -37,7 +38,7 @@ for n_E = n_Ev
         Emitters = CreateEmittersArray2 (n_E, Pt, m, Lx, Ly, Lz);
         
         % Create the receivers set
-        Receivers = CreateReceiversArray2 (n_R, dx*dy, Ts, n, Psi, Lx, Ly);
+        Receivers = CreateReceiversArray2 (n_R, dx*dy, Ts, n, Psi, R, Lx, Ly);
         
         tic
         % Create the matrices

@@ -1,4 +1,4 @@
-function [ Receivers ] = CreateReceiversArray( nx, ny, Ar, Ts, n, Psi, Lx, Ly )
+function [ Receivers ] = CreateReceiversArray( nx, ny, Ar, Ts, n, Psi, R, Lx, Ly )
 %CREATERECEIVERSARRAY Creates a regularly spaced array of nx x ny receivers in a area of Lx x Ly
 %
 %   Receivers = CreateReceiversArray( nx, ny, Ar, Ts, n, Psi, Lx, Ly )
@@ -12,7 +12,7 @@ function [ Receivers ] = CreateReceiversArray( nx, ny, Ar, Ts, n, Psi, Lx, Ly )
 
 n_Receivers = nx * ny;
 
-Receivers = newReceivers(n_Receivers, Ar, Ts, n, Psi);
+Receivers = newReceivers(n_Receivers, Ar, Ts, n, Psi, R);
 
 % Base position is at (0,0,0), looking up (no change in the axis
 % orientation)

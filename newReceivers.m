@@ -1,7 +1,7 @@
 function [ Receivers ] = newReceivers( varargin )
 %NEWRECEIVERS Creates new Receivers
-%   Receivers = newReceivers(n_Receivers, Ar, Ts, n, Psi)
-%   Receivers = newReceivers(Ar, Ts, n, Psi)
+%   Receivers = newReceivers(n_Receivers, Ar, Ts, n, Psi,R)
+%   Receivers = newReceivers(Ar, Ts, n, Psi,R)
 %   Receivers = newReceivers(n_Receivers)
 %   Receivers = newReceivers()
 % 
@@ -10,6 +10,7 @@ function [ Receivers ] = newReceivers( varargin )
 %   Ts          - receiver filter gain (default: 1)
 %   n           - receiver's internal refractive index (default: 1)
 %   Psi         - Hemi-FOV (default: pi/2)
+%   R           - Receiver's responsivity
 %
 %   Creates an emitter of an array of n_Receivers receivers. If n_Receivers
 %   is omitted, Receivers has 1 single element. If all other arguments are
@@ -17,27 +18,32 @@ function [ Receivers ] = newReceivers( varargin )
 %
 %   The HTM of the receivers are placed at the origin. 
 
-if (nargin == 5)
+% Default values
+Ar = 0.01;
+Ts = 1;
+n = 1;
+Psi = pi/2;
+Pr = 0;
+R = 1;
+
+if (nargin == 6)
     n_Receivers = varargin{1};
     Ar = varargin{2};
     Ts = varargin{3};
     n = varargin{4};
     Psi = varargin{5};
-    Pr = 0;
-elseif (nargin == 4)
+    R = varargin{6};
+    
+elseif (nargin == 5)
     n_Receivers = 0;
     Ar = varargin{1};
     Ts = varargin{2};
     n = varargin{3};
     Psi = varargin{4};
-    Pr = 0;
+    R = varargin{5};
 elseif (nargin == 1)
     n_Receivers = varargin{1};
-    Ar = 0.01;
-    Ts = 1;
-    n = 1; 
-    Psi = pi/2;
-    Pr = 0;
+    
 elseif (nargin == 0)
     n_Receivers = 0;
     Ar = [];
@@ -47,7 +53,8 @@ else
 end
 
 % Create the receiver structure:
-Receiver_t = struct('HTM',{},'Ar',{},'Ts',{},'n',{},'Psi',{},'Pr',{});
+Receiver_t = struct('HTM',{},'Ar',{},'Ts',{},'n',{},...
+    'Psi',{},'Pr',{},'R',{});
 
 if(numel(Ar) == 1)
     % Receiver parameters are defined
@@ -56,6 +63,7 @@ if(numel(Ar) == 1)
     Receiver_t(1).n = n;
     Receiver_t(1).Psi = Psi;
     Receiver_t(1).Pr = Pr;
+    Receiver_t(1).R = R;
     Receiver_t(1).HTM = eye(4);
 end
 
@@ -67,8 +75,6 @@ else
     % Replicate to create the receivers array:
     Receivers = repmat(Receiver_t,1,n_Receivers);
 end
-
-
 
 end
 

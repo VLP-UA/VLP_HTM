@@ -1,4 +1,4 @@
-function [ Receivers ] = CreateReceiversArray2( n_Receivers, Ar, Ts, n, Psi, Lx, Ly )
+function [ Receivers ] = CreateReceiversArray2( n_Receivers, Ar, Ts, n, Psi, R, Lx, Ly )
 %CREATERECEIVERSARRAY2 Creates a regularly spaced array of n_Receivers receivers in a area of Lx x Ly
 %
 %   Receivers = CreateReceiversArray( n_Receivers, Ar, Ts, n, Psi, Lx, Ly )
@@ -12,4 +12,4 @@ function [ Receivers ] = CreateReceiversArray2( n_Receivers, Ar, Ts, n, Psi, Lx,
 
 [ nx, ny ] = factorise2(n_Receivers);
 
-Receivers = CreateReceiversArray( nx, ny, Ar, Ts, n, Psi, Lx, Ly );
+Receivers = CreateReceiversArray( nx, ny, Ar, Ts, n, Psi, R, Lx, Ly );
