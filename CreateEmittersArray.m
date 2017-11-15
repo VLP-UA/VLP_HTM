@@ -1,9 +1,10 @@
-function [ Emitters ] = CreateEmittersArray( nx, ny, Pt, m, Lx, Ly, Z )
+function [ Emitters ] = CreateEmittersArray( nx, ny, Pb, Ps, m, Lx, Ly, Z )
 %CREATEEMITTERSARRAY Creates a regularly spaced 2 dimensional array of nx x ny emitters
-%   Emitters = CreateEmittersArray( nx, ny, Pt, m, Lx, Ly, Z )
+%   Emitters = CreateEmittersArray( nx, ny, Pb, Ps, m, Lx, Ly, Z )
 %
 %   nx, ny      - dimension of emitter array in x and y directions.
-%   Pt          - Transmited power in each emitter
+%   Pb          - Power in the base (DC) component in each emitter
+%   Ps          - Power in the signal component in each emitter
 %   m           - Lambertian order of the emitter
 %   Lx, Ly      - Total length of the array in x and y directions, resp.
 %   Z           - z coordinate (if real) or base HTM (HTM of the 1st emitter)
@@ -12,9 +13,14 @@ function [ Emitters ] = CreateEmittersArray( nx, ny, Pt, m, Lx, Ly, Z )
 %   (i.e., with z axis pointing downwards) when Z is real valued or placed
 %   starting at the location defined by the HTM Z, if Z is a 4x4 matrix.
 
+%   14.11.2017  pf@ua.pt
+%               Changed for Emitters with distinct Pb and Ps (Pt removed)
+
+% TODO: Pb, PS and m are arrays with individual values for each emitter.
+
 n_Emitters = nx * ny; 
 
-Emitters = newEmitters(n_Emitters, Pt, m);
+Emitters = newEmitters(n_Emitters, Pb, Ps, m);
 
 if (size(Z) == [1 1] )
     % No base HTM provided.

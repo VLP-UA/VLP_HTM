@@ -35,3 +35,7 @@
 %
 %   Miscelaneous:
 %   factorise2            - Computes two factors that, multiplied, result in n
+%   demo2                  - Demonstrates the usage of HTM based VLP code
+%   newEmittersTest        - 
+%   vlpRecIndication       - Computes the signal received by a photodiode sensor
+%   vlpRecIndicationVerify - 
