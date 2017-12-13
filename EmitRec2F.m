@@ -100,7 +100,6 @@ u = Delta ./ DistRep;
 mv = [ Emitters.m ];
 Mm = repmat(mv,[n_Receivers 1]);
 
-
 F2 = squeeze(dot(Mn_E,-u)).^Mm;
 
 F3 = squeeze(dot(Mn_R,u));

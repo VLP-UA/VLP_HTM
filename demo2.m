@@ -16,7 +16,7 @@ addpath('../ProjGeom');
 % Define the model default values
 
 % Emitters
-n_Emitters = 3;         % Number of emitters
+n_Emitters = 4;         % Number of emitters
 Pt = 1 ;                % Transmitted power
 m = 4;                  % Lambertian mode number
 
@@ -50,8 +50,9 @@ Receivers = newReceivers(n_Receivers,Ar, Ts, n, Psi, R);
 Em_Base_HTM = Trans3(1.5,1.5,2)*RotX3(pi);      % Base HTM at the center of the ceiling. 
 
 Emitters(1).HTM = Em_Base_HTM*Trans3(0.5,0,0);
-Emitters(2).HTM = Em_Base_HTM*RotZ3(2*pi/3)*Trans3(0.5,0,0);
-Emitters(3).HTM = Em_Base_HTM*RotZ3(4*pi/3)*Trans3(0.5,0,0);
+Emitters(2).HTM = Em_Base_HTM*RotZ3(pi/2)*Trans3(0.5,0,0);
+Emitters(3).HTM = Em_Base_HTM*RotZ3(pi)*Trans3(0.5,0,0);
+Emitters(4).HTM = Em_Base_HTM*RotZ3(3*pi/2)*Trans3(0.5,0,0);
 
 % Receivers are organized in Parallel and Meridians arragement of photo
 % detectors, with Nm Meridians and 3 Parallels, in a sphere with
