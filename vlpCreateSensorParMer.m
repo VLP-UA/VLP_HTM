@@ -1,8 +1,8 @@
 function SensorArray = vlpCreateSensorParMer(PDArray, NParal,NMerid, r, varargin)
 %VLPCREATESENSORPARMER Creates a VLP sensor with parallels and meridians
 %
-%   SensorArray = vlpCreateSensorParMer(PDArray, NParal, NMerid, r, PParal, PMerid)
-%   SensorArray = vlpCreateSensorParMer(PDArray, NParal, NMerid, r, PParal)
+%   SensorArray = vlpCreateSensorParMer(PDArray, NParal, NMerid, r, PMerid, PParal)
+%   SensorArray = vlpCreateSensorParMer(PDArray, NParal, NMerid, r, PMerid)
 %   SensorArray = vlpCreateSensorParMer(PDArray, NParal, NMerid, r)
 %
 %   vlpCreateSensorParMer gets an array of photodetectors PDArray and
@@ -42,9 +42,9 @@ PParal = 0;
 % Processing the input arguments
 nVarargs = length(varargin);
 if (nVarargs >= 1)
-	PParal = varargin{1};
+	PMerid = varargin{1};
 	if nVarargs >=2
-		PMerid = varargin{2};
+		PParal = varargin{2};
 	end
 end
 
