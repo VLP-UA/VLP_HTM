@@ -10,22 +10,22 @@ addpath('../');
 % Define the model default values
 %% simulation parameters
 %emitter
-params.n_Emitters = 6;
-params.m = 1;
+params.n_Emitters = 4;
+params.m =3;
 params.Pb = 1;
-params.Ps = 0.025;
+params.Ps = 0.25;
 
 params.Re = 2.5;
 
 %room
-params.W = 5;
-params.L = 5;
+params.W = 7.5;
+params.L = 7.5;
 params.H = 2.5;
 
 %receiver
-params.Np = 9;
-params.Nm = 12;
-params.Psi = 22.5;
+params.Np = 6;
+params.Nm = 11;
+params.Psi = 15;
 params.SR = 0.25;
 
 %% Create the light emitters
@@ -44,14 +44,21 @@ W = params.W;
 L = params.L;
 H = params.H; 
 
-Em_Base_HTM = Trans3(W/2,L/2,H)*RotX3(pi);      % Base HTM at the center of the ceiling. 
+offset = 5;
 
+Em_Base_HTM = Trans3(0,0,H)*RotX3(pi);      % Base HTM at the center of the ceiling. 
 
+tempx = linspace(offset,W-offset,sqrt(n_Emitters));
+tempy = linspace(offset,L-offset,sqrt(n_Emitters));
+[temp_x,temp_y] = meshgrid(tempx,tempy);
+
+temp_x=temp_x(:);
+temp_y=temp_y(:);
 % Light emitters placed at ceiling, in a circle of radius R
 Re = params.Re;
 for i=1:n_Emitters
-  Emitters(i).HTM = Em_Base_HTM*RotZ3(i*(2*pi)/n_Emitters)*...
-    Trans3(Re,0,0)*RotY3(pi/8*0);
+  Emitters(i).HTM =Trans3(temp_x(i),temp_y(i),0)* Em_Base_HTM*...
+    RotY3(pi/8*0);
 end
 
 % Plot the emitters position
@@ -117,8 +124,8 @@ Z_p = 100e6*nRec_v;      % PD equivalent impedace = 100 MOhm
 
 %% Main cycle
 
-Wstep = W/10;
-Lstep = L/10;
+Wstep =0.5;
+Lstep = 0.5;
 
 xloc = 0:Wstep:W;
 yloc = 0:Lstep:L;
@@ -142,7 +149,7 @@ for ix = 1:numel(xloc)
     
     for counter = 1:Nrep
       s = sqrt(Nu).*randn(size(Y));
-      Ynoise = Y;% + s;
+      Ynoise = Y ;%+ s;
       
       stemp(counter,:,:) = s;
       
@@ -174,6 +181,7 @@ for ix = 1:numel(xloc)
         accepted = recP > mrecP;
         mrecP = 0.98*mrecP;
       end
+      mrecP
       
       % Get the emitters position
       temp = [Emitters.HTM];
@@ -226,37 +234,77 @@ for i = 1:length(field)
 end
 
 
-figure;
-title(filename);
-save(['./res/res_' filename num2str(Wstep) '.mat'], 'res', 'params');
+% % figure;
+% % title(filename);
 % 
 
 % plot quiver mov
-
-PlotHTMArray(Emitters);
-axis equal;
-view(3);
-grid on
-
-for ix = 1:numel(xloc)
-  for iy = 1:numel(yloc)
-    quiver(xloc(ix),yloc(iy), res(ix,iy).loc(1)-xloc(ix), res(ix,iy).loc(2)-yloc(iy),'o')
-  end
-end
+% % 
+% % PlotHTMArray(Emitters);
+% % axis equal;
+% % view(3);
+% % grid on
+% % 
+% % for ix = 1:numel(xloc)
+% %   for iy = 1:numel(yloc)
+% %     quiver(xloc(ix),yloc(iy), res(ix,iy).loc(1)-xloc(ix), res(ix,iy).loc(2)-yloc(iy),'o')
+% %   end
+% % end
 
 % figure(1)
 % quiver(xloc,yloc, location-[xloc(ix);yloc(iy)],'o')
-figure
-
-title(filename);
-axis equal;
-view(3);
-grid on
-
-PlotHTMArray(Emitters);
-h=surf(xloc,yloc,reshape([res.dist],ix,iy));
-
-shading interp
-colorbar
+%% hi
+% % % % figure
+% % % % 
+% % % % title(filename);
+% % % % axis equal;
+% % % % view(3);
+% % % % grid on
+% % % % 
+% % % % PlotHTMArray(Emitters);
 
 
+% to take a closer look activate plot under 0.5 m
+%graph will be plotted with all values above 0.5 m trimed of
+max_H = 0.1;
+% % 
+% % plot_under_0_5 = 1;
+% % 
+ mtemp=reshape([res.dist],ix,iy);
+% % if(plot_under_0_5 ==1)
+    mtempb=double(mtemp < max_H);
+    mtemp=mtemp.*(1*mtempb-1e-2);
+    underPercentage=sum(sum(mtempb))/numel(mtemp)
+% % % end
+% % % h=surf(xloc,yloc,mtemp);
+% % % axis([0 W 0 L 0 H])
+% % % 
+% % % shading interp
+% % % colorbar
+
+% % % %% all plot
+% % % figure
+% % % 
+% % % title(filename);
+% % % axis equal;
+% % % view(3);
+% % % grid on
+% % % 
+% % % PlotHTMArray(Emitters);
+% % % 
+% % % 
+% % % % to take a closer look activate plot under 0.5 m
+% % % %graph will be plotted with all values above 0.5 m trimed of
+% % % max_H = 0.1;
+% % % 
+% % % plot_under_0_5 = 1;
+% % % 
+% % % mtemp=reshape([res.dist],ix,iy);
+% % % h=surf(xloc,yloc,mtemp);
+% % % axis([0 W 0 L 0 H])
+% % % 
+% % % shading interp
+% % % colorbar
+
+
+save(['./res/square_' filename num2str(Wstep) '.mat'], 'res', 'params','underPercentage');
