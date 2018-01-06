@@ -45,10 +45,12 @@ Nm1 = 10:72;
 
 %from the comment above choose a value to set m and Psi
 params.m = 1;
-params.Psi = 5;
+params.Psi = 10;
 
 %% Compile data into data struture
 index=1;
+
+
 for iNp = 1:numel(Np1)
     for iNm = 1:numel(Nm1)
         
@@ -144,41 +146,43 @@ for i=1:params.n_Emitters
 end
 
 
-
+%%
 figure
 PlotHTMArray(Emitters);
 
-contour3(xloc,yloc,reshape([data(1635).res.dist],16,16),100)
+surf(xloc,yloc,reshape([data(1636).res.dist],16,16))
 shading interp
 colorbar
 axis([0 params.W 0 params.L 0 params.H])
 view(3)
-
+title('Error along the XY plane')
+xlabel('X(m)')
+ylabel('Y(m)')
 
 %% plot error under 10 cm
-% % % figure
-% % % 
-% % % PlotHTMArray(Emitters);
-% % % axis equal;
-% % % view(3);
-% % % grid on
-% % % % to take a closer look activate plot under 0.5 m
-% % % %graph will be plotted with all values above 0.5 m trimed of
-% % % max_H = 0.1;
-% % % 
-% % % 
-% % % mtemp=reshape([res.dist],16,16);
-% % % 
-% % % mtempb=double(mtemp < max_H);
-% % % mtemp=mtemp.*(1*mtempb-1e-2);
-% % % underPercentage=sum(sum(mtempb))/numel(mtemp)
-% % % 
-% % % 
-% % % h=contour3(xloc,yloc,mtemp,100);
-% % % axis([0 params.W 0 params.L 0 params.H])
-% % % 
-% % % shading interp
-% % % colorbar
+figure
+
+PlotHTMArray(Emitters);
+axis equal;
+view(3);
+grid on
+% to take a closer look activate plot under 0.5 m
+%graph will be plotted with all values above 0.5 m trimed of
+max_H = 0.1;
+
+
+mtemp=reshape([data(1636).res.dist],16,16);
+
+mtempb=double(mtemp < max_H);
+mtemp=mtemp.*(1*mtempb)+(mtempb-1)*(-0.1);
+underPercentage=sum(sum(mtempb))/numel(mtemp)
+
+
+h=surf(xloc,yloc,mtemp);
+axis([0 params.W 0 params.L 0 params.H])
+
+shading interp
+colorbar
 
 %% Plotting with smaller range for simulations
 
