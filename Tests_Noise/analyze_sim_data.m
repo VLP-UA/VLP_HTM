@@ -6,7 +6,7 @@
 
 %% Basic setup
 clear all;
-close all;
+% close all;
 
 % add the path to the projective geometry functions
 addpath('../../ProjGeom');
@@ -45,7 +45,7 @@ Nm1 = 10:72;
 
 %from the comment above choose a value to set m and Psi
 params.m = 1;
-params.Psi = 10;
+params.Psi = 12.5;
 
 %% Compile data into data struture
 index=1;
@@ -86,27 +86,29 @@ for index = 1: numel(data)
     data(index).mean = mean([data(index).res.dist]);
     data(index).std = std([data(index).res.dist]);
     
-    mMax(data(index).params.Np-4, data(index).params.Nm-9) = data(index).max;
-    mMean(data(index).params.Np-4, data(index).params.Nm-9) = data(index).mean;
-    mStd(data(index).params.Np-4, data(index).params.Nm-9) = data(index).std;
+    mMax(data(index).params.Nm-9,data(index).params.Np-4) = data(index).max;
+    mMean(data(index).params.Nm-9,data(index).params.Np-4) = data(index).mean;
+    mStd(data(index).params.Nm-9,data(index).params.Np-4) = data(index).std;
 end
 
 %max error plot
-figure 
-surf(Nm1,Np1,mMax)
+figure
+surf(Np1,Nm1,mMax)
 title('Max error across Nm and Np')
-xlabel('Number of meridians')
-ylabel('Number of paralels')
+
+ylabel('Number of meridians')
+xlabel('Number of paralels')
 shading interp
 colorbar
 view(2)
 
 %mean error plot
-figure 
-surf(Nm1,Np1,mMean)
+figure
+surf(Np1,Nm1,mMean)
 title('Mean error across Nm and Np')
-xlabel('Number of meridians')
-ylabel('Number of paralels')
+
+ylabel('Number of meridians')
+xlabel('Number of paralels')
 shading interp
 colorbar
 view(2)
@@ -114,10 +116,10 @@ view(2)
 
 %std error plot
 figure
-surf(Nm1,Np1,mStd)
-title('Standard deviation of the error across Nm and Np') 
-xlabel('Number of meridians')
-ylabel('Number of paralels')
+surf(Np1,Nm1,mStd)
+title('Standard deviation of the error across Nm and Np')
+ylabel('Number of meridians')
+xlabel('Number of paralels')
 shading interp
 colorbar
 view(2)
@@ -150,12 +152,31 @@ end
 figure
 PlotHTMArray(Emitters);
 
-surf(xloc,yloc,reshape([data(1636).res.dist],16,16))
+% dToPlot=find(mStd==min(min(mStd)))
+
+%find the highest percentage under 10cm
+highest = 0;
+index=0;
+for i= 1:numel(data)
+    if(data(i).underPercentage > highest)
+        highest = data(i).underPercentage;
+        index=i;
+    end
+    
+end
+
+index
+highest
+
+%%
+dToPlot = index;
+
+surf(xloc,yloc,reshape([data(dToPlot).res.dist],16,16))
 shading interp
 colorbar
 axis([0 params.W 0 params.L 0 params.H])
 view(3)
-title('Error along the XY plane')
+title(['Error along the XY plane (' num2str(data(dToPlot).params.Np) ' parallels, ' num2str(data(dToPlot).params.Nm) ' meridians)'])
 xlabel('X(m)')
 ylabel('Y(m)')
 
@@ -163,15 +184,13 @@ ylabel('Y(m)')
 figure
 
 PlotHTMArray(Emitters);
-axis equal;
-view(3);
-grid on
+
 % to take a closer look activate plot under 0.5 m
 %graph will be plotted with all values above 0.5 m trimed of
 max_H = 0.1;
 
-
-mtemp=reshape([data(1636).res.dist],16,16);
+% dToPlot=find(mMean==min(min(mMean)))
+mtemp=reshape([data(dToPlot).res.dist],16,16);
 
 mtempb=double(mtemp < max_H);
 mtemp=mtemp.*(1*mtempb)+(mtempb-1)*(-0.1);
@@ -181,31 +200,39 @@ underPercentage=sum(sum(mtempb))/numel(mtemp)
 h=surf(xloc,yloc,mtemp);
 axis([0 params.W 0 params.L 0 params.H])
 
+title(['Error along the XY plane (' num2str(data(dToPlot).params.Np) ' parallels, ' num2str(data(dToPlot).params.Nm) ' meridians)'])
+xlabel('X(m)')
+ylabel('Y(m)')
+
+axis equal;
+view(3);
+grid on
 shading interp
 colorbar
 
 %% Plotting with smaller range for simulations
 
 %max error plot
-figure 
-surf(Nm1(40-10:end),Np1(15-5:end),mMax(15-5:end, 40-10:end))%plot for np> 15 and nm > 40
+figure
+surf(Np1(15-5:end),Nm1(40-10:end),mMax(40-10:end,15-5:end))%plot for np> 15 and nm > 40
 title('Max error across Nm and Np')
-xlabel('Number of meridians')
-ylabel('Number of paralels')
+ylabel('Number of meridians')
+xlabel('Number of paralels')
 
-axis([40 72 15 30])
+
+axis([15 30 40 72])
 shading interp
 colorbar
 view(2)
 
 %mean error plot
-figure 
-surf(Nm1(40-10:end),Np1(15-5:end),mMean(15-5:end,40-10:end))%plot for np> 15 and nm > 40
+figure
+surf(Np1(15-5:end),Nm1(40-10:end),mMean(40-10:end,15-5:end))%plot for np> 15 and nm > 40
 title('Mean error across Nm and Np')
-xlabel('Number of meridians')
-ylabel('Number of paralels')
+ylabel('Number of meridians')
+xlabel('Number of paralels')
 
-axis([40 72 15 30])
+axis([15 30 40 72])
 shading interp
 colorbar
 view(2)
@@ -213,15 +240,128 @@ view(2)
 
 %std error plot
 figure
-surf(Nm1(40-10:end),Np1(15-5:end),mStd(15-5:end,40-10:end))
-title('Standard deviation of the error across Nm and Np') 
-xlabel('Number of meridians')
-ylabel('Number of paralels')
+surf(Np1(15-5:end),Nm1(40-10:end),mStd(40-10:end,15-5:end))
+title('Standard deviation of the error across Nm and Np')
+ylabel('Number of meridians')
+xlabel('Number of paralels')
 
-axis([40 72 15 30])
+axis([15 30 40 72])
 shading interp
 colorbar
 view(2)
+
+
+%% Plot graph of average plus 2 std
+%% highest percentage under
+
+dToPlot; % value of the graph to plot
+
+figure;
+
+
+surf(xloc,yloc,reshape([data(dToPlot).res.dist],16,16))
+shading interp
+axis([0 params.W 0 params.L data(dToPlot).mean-2*data(dToPlot).std...
+    data(dToPlot).mean+2*data(dToPlot).std])
+
+colorbar
+caxis([data(dToPlot).mean- 2*data(dToPlot).std data(dToPlot).mean+2*data(dToPlot).std])
+
+view(2)
+title({['Error along the XY plane (' num2str(data(dToPlot).params.Np)...
+    ' parallels, ' num2str(data(dToPlot).params.Nm) ' meridians)']; 'Mean + 2 Standard Deviations'})
+xlabel('X(m)')
+ylabel('Y(m)')
+
+%% Plot graph of average + 2 std for lowest mean
+
+
+dToPlot= find(mMean==min(min([mMean])));
+
+figure;
+
+
+surf(xloc,yloc,reshape([data(dToPlot).res.dist],16,16))
+shading interp
+axis([0 params.W 0 params.L data(dToPlot).mean-2*data(dToPlot).std...
+    data(dToPlot).mean+2*data(dToPlot).std])
+
+colorbar
+caxis([data(dToPlot).mean- 2*data(dToPlot).std data(dToPlot).mean+2*data(dToPlot).std])
+
+view(2)
+
+title({['Error along the XY plane (' num2str(data(dToPlot).params.Np)...
+    ' parallels, ' num2str(data(dToPlot).params.Nm) ' meridians)'];...
+    ['Mean (' num2str(data(dToPlot).mean) ') + 2 Standard Deviations ('...
+    num2str(data(dToPlot).std) ')']})
+
+xlabel('X(m)')
+ylabel('Y(m)')
+
+
+%% Plot graph of average + 2 std for lowest std
+
+
+dToPlot= find(mStd==min(min(mStd)))
+
+figure;
+
+
+surf(xloc,yloc,reshape([data(dToPlot).res.dist],16,16))
+shading interp
+axis([0 params.W 0 params.L data(dToPlot).mean-2*data(dToPlot).std...
+    data(dToPlot).mean+2*data(dToPlot).std])
+
+colorbar
+caxis([data(dToPlot).mean- 2*data(dToPlot).std data(dToPlot).mean+2*data(dToPlot).std])
+
+view(2)
+title({['Error along the XY plane (' num2str(data(dToPlot).params.Np)...
+    ' parallels, ' num2str(data(dToPlot).params.Nm) ' meridians)'];...
+    ['Mean (' num2str(data(dToPlot).mean) ') + 2 Standard Deviations ('...
+    num2str(data(dToPlot).std) ')']})
+xlabel('X(m)')
+ylabel('Y(m)')
+
+%% Plot graph of average + 2 std for lowest std
+
+
+dToPlot= find(mMax==min(min(mMax)))
+
+figure;
+
+
+surf(xloc,yloc,reshape([data(dToPlot).res.dist],16,16))
+shading interp
+axis([0 params.W 0 params.L data(dToPlot).mean-2*data(dToPlot).std...
+    data(dToPlot).mean+2*data(dToPlot).std])
+
+colorbar
+caxis([data(dToPlot).mean- 2*data(dToPlot).std data(dToPlot).mean+2*data(dToPlot).std])
+
+view(2)
+title({['Error along the XY plane (' num2str(data(dToPlot).params.Np)...
+    ' parallels, ' num2str(data(dToPlot).params.Nm) ' meridians)'];...
+    ['Mean (' num2str(data(dToPlot).mean) ') + 2 Standard Deviations ('...
+    num2str(data(dToPlot).std) ')']})
+xlabel('X(m)')
+ylabel('Y(m)')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
