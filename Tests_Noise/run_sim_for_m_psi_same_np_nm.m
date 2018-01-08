@@ -33,10 +33,10 @@ params.SR = 0.25;
 %% Parameter to be changed in the simulation
 m1 = [1,2,3,4,5,6];
 Psi1 = [5 7.5 10 12.5];
-Np1 = 28:29;
-Nm1 = 70:72;
+Np1 = 28:29;%30:32;%28:29
+Nm1 = 73:74; %70:74;%73:74
 
-for d=1:numel(Np1)
+for d=1:numel(Np1) 
     for e=1:numel(Nm1)
         for c=1:numel(Psi1)
             for b=1:numel(m1)
@@ -61,7 +61,7 @@ for d=1:numel(Np1)
                     filename = [ filename num2str(getfield(params,field{i})) '-'] ;
                 end
                 
-                save(['./res/square_' filename num2str(Wstep) '.mat'], 'res',...
+                save(['./res/square_' filename num2str(Wstep) '-' num2str(getfield(params,field{1})) '.mat'], 'res',...
                     'params','underPercentage','broken');
                 
                 %Clear vars from the previous simulation before the new one

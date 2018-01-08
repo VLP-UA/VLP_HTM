@@ -19,7 +19,7 @@ W = params.W;
 L = params.L;
 H = params.H;
 
-offset = 5;
+offset = 2.5;
 
 Em_Base_HTM = Trans3(0,0,H)*RotX3(pi);      % Base HTM at the center of the ceiling.
 
