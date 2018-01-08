@@ -6,14 +6,14 @@
 
 %% Basic setup
 clear all;
-% close all;
+close all;
 
 % add the path to the projective geometry functions
 addpath('../../ProjGeom');
 addpath('../');
 
 
-
+path_fig = './figures/';
 %% simulation parameters
 %emitter
 params.n_Emitters = 4; %square mode
@@ -47,6 +47,8 @@ Nm1 = 10:72;
 params.m = 1;
 params.Psi = 12.5;
 
+path_fig=[path_fig 'm_' num2str(params.m) '_psi_' num2str(params.Psi) '/'];
+
 %% Compile data into data struture
 index=1;
 
@@ -64,7 +66,7 @@ for iNp = 1:numel(Np1)
         for i = [2 11 9 10]
             filename = [ filename num2str(getfield(params,field{i})) '-'] ;
         end
-        load(['./res/square_' filename num2str(Wstep) '.mat'], 'res',...
+        load(['./long_test_m_1/square_' filename num2str(Wstep) '.mat'], 'res',...
             'params','underPercentage','broken');
         
         %place data from file in struct for easier access
@@ -77,9 +79,7 @@ for iNp = 1:numel(Np1)
 end
 
 
-%%
-
-%get maximum mean and standard deviation from the collected data
+%% get maximum mean and standard deviation from the collected data
 for index = 1: numel(data)
     data(index).max = max([data(index).res.dist]);
     
@@ -93,7 +93,7 @@ end
 
 %max error plot
 figure
-surf(Np1,Nm1,mMax)
+contour3(Np1,Nm1,mMax,100)
 title('Max error across Nm and Np')
 
 ylabel('Number of meridians')
@@ -102,9 +102,12 @@ shading interp
 colorbar
 view(2)
 
+saveas(gcf, [path_fig 'max_np_nm'], 'png')
+
+
 %mean error plot
 figure
-surf(Np1,Nm1,mMean)
+contour3(Np1,Nm1,mMean,100)
 title('Mean error across Nm and Np')
 
 ylabel('Number of meridians')
@@ -112,19 +115,20 @@ xlabel('Number of paralels')
 shading interp
 colorbar
 view(2)
-
+saveas(gcf, [path_fig 'mean_np_nm.png'], 'png')
 
 %std error plot
 figure
-surf(Np1,Nm1,mStd)
+contour3(Np1,Nm1,mStd,100)
 title('Standard deviation of the error across Nm and Np')
 ylabel('Number of meridians')
 xlabel('Number of paralels')
 shading interp
 colorbar
 view(2)
+saveas(gcf, [path_fig 'std_np_nm.png'], 'png')
 
-%%
+%% Load emttiers to plot in 3d graph
 
 xloc=0:Wstep:params.W;
 yloc=0:Wstep:params.L;
@@ -148,7 +152,7 @@ for i=1:params.n_Emitters
 end
 
 
-%%
+%% Find and Plot highest % under 10cm
 figure
 PlotHTMArray(Emitters);
 
@@ -168,10 +172,9 @@ end
 index
 highest
 
-%%
 dToPlot = index;
 
-surf(xloc,yloc,reshape([data(dToPlot).res.dist],16,16))
+contour3(xloc,yloc,reshape([data(dToPlot).res.dist],16,16),100)
 shading interp
 colorbar
 axis([0 params.W 0 params.L 0 params.H])
@@ -179,8 +182,11 @@ view(3)
 title(['Error along the XY plane (' num2str(data(dToPlot).params.Np) ' parallels, ' num2str(data(dToPlot).params.Nm) ' meridians)'])
 xlabel('X(m)')
 ylabel('Y(m)')
+saveas(gcf, [path_fig 'error_across_xy.png'], 'png')
+view(2);
+saveas(gcf, [path_fig 'error_across_xy_top_view.png'], 'png')
 
-%% plot error under 10 cm
+%%plot error under 10 cm
 figure
 
 PlotHTMArray(Emitters);
@@ -197,7 +203,7 @@ mtemp=mtemp.*(1*mtempb)+(mtempb-1)*(-0.1);
 underPercentage=sum(sum(mtempb))/numel(mtemp)
 
 
-h=surf(xloc,yloc,mtemp);
+h=contour3(xloc,yloc,mtemp,100);
 axis([0 params.W 0 params.L 0 params.H])
 
 title(['Error along the XY plane (' num2str(data(dToPlot).params.Np) ' parallels, ' num2str(data(dToPlot).params.Nm) ' meridians)'])
@@ -214,20 +220,21 @@ colorbar
 
 %max error plot
 figure
-surf(Np1(15-5:end),Nm1(40-10:end),mMax(40-10:end,15-5:end))%plot for np> 15 and nm > 40
+contour3(Np1(15-5:end),Nm1(40-10:end),mMax(40-10:end,15-5:end),100)%plot for np> 15 and nm > 40
 title('Max error across Nm and Np')
 ylabel('Number of meridians')
 xlabel('Number of paralels')
-
 
 axis([15 30 40 72])
 shading interp
 colorbar
 view(2)
 
+saveas(gcf, [path_fig 'max_np_nm_ranged.png'], 'png')
+
 %mean error plot
 figure
-surf(Np1(15-5:end),Nm1(40-10:end),mMean(40-10:end,15-5:end))%plot for np> 15 and nm > 40
+contour3(Np1(15-5:end),Nm1(40-10:end),mMean(40-10:end,15-5:end),100)%plot for np> 15 and nm > 40
 title('Mean error across Nm and Np')
 ylabel('Number of meridians')
 xlabel('Number of paralels')
@@ -237,10 +244,11 @@ shading interp
 colorbar
 view(2)
 
+saveas(gcf, [path_fig 'mean_np_nm_ranged.png'], 'png')
 
 %std error plot
 figure
-surf(Np1(15-5:end),Nm1(40-10:end),mStd(40-10:end,15-5:end))
+contour3(Np1(15-5:end),Nm1(40-10:end),mStd(40-10:end,15-5:end),100)
 title('Standard deviation of the error across Nm and Np')
 ylabel('Number of meridians')
 xlabel('Number of paralels')
@@ -249,6 +257,7 @@ axis([15 30 40 72])
 shading interp
 colorbar
 view(2)
+saveas(gcf, [path_fig 'std_np_nm_ranged.png'], 'png')
 
 
 %% Plot graph of average plus 2 std
@@ -259,7 +268,7 @@ dToPlot; % value of the graph to plot
 figure;
 
 
-surf(xloc,yloc,reshape([data(dToPlot).res.dist],16,16))
+contour3(xloc,yloc,reshape([data(dToPlot).res.dist],16,16),100)
 shading interp
 axis([0 params.W 0 params.L data(dToPlot).mean-2*data(dToPlot).std...
     data(dToPlot).mean+2*data(dToPlot).std])
@@ -281,7 +290,7 @@ dToPlot= find(mMean==min(min([mMean])));
 figure;
 
 
-surf(xloc,yloc,reshape([data(dToPlot).res.dist],16,16))
+contour3(xloc,yloc,reshape([data(dToPlot).res.dist],16,16),100)
 shading interp
 axis([0 params.W 0 params.L data(dToPlot).mean-2*data(dToPlot).std...
     data(dToPlot).mean+2*data(dToPlot).std])
@@ -298,6 +307,9 @@ title({['Error along the XY plane (' num2str(data(dToPlot).params.Np)...
 
 xlabel('X(m)')
 ylabel('Y(m)')
+
+
+saveas(gcf, [path_fig 'error_across_xy_lowest_mean'], 'png')
 
 
 %% Plot graph of average + 2 std for lowest std
@@ -308,7 +320,7 @@ dToPlot= find(mStd==min(min(mStd)))
 figure;
 
 
-surf(xloc,yloc,reshape([data(dToPlot).res.dist],16,16))
+contour3(xloc,yloc,reshape([data(dToPlot).res.dist],16,16),100)
 shading interp
 axis([0 params.W 0 params.L data(dToPlot).mean-2*data(dToPlot).std...
     data(dToPlot).mean+2*data(dToPlot).std])
@@ -324,7 +336,10 @@ title({['Error along the XY plane (' num2str(data(dToPlot).params.Np)...
 xlabel('X(m)')
 ylabel('Y(m)')
 
-%% Plot graph of average + 2 std for lowest std
+
+saveas(gcf, [path_fig 'error_across_xy_lowest_std'], 'png')
+
+%% Plot graph of average + 2 std for lowest max
 
 
 dToPlot= find(mMax==min(min(mMax)))
@@ -332,7 +347,7 @@ dToPlot= find(mMax==min(min(mMax)))
 figure;
 
 
-surf(xloc,yloc,reshape([data(dToPlot).res.dist],16,16))
+contour3(xloc,yloc,reshape([data(dToPlot).res.dist],16,16),100)
 shading interp
 axis([0 params.W 0 params.L data(dToPlot).mean-2*data(dToPlot).std...
     data(dToPlot).mean+2*data(dToPlot).std])
@@ -348,6 +363,8 @@ title({['Error along the XY plane (' num2str(data(dToPlot).params.Np)...
 xlabel('X(m)')
 ylabel('Y(m)')
 
+
+saveas(gcf, [path_fig 'error_across_xy_lowest_max'], 'png')
 
 
 
