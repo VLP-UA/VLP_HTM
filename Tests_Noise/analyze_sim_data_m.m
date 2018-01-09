@@ -239,6 +239,17 @@ saveas(gcf, [path_fig 'psi_hpa_to_std_' num2str(params.Np) '_np_' num2str(params
 % % % 
 
 
-
+%%
+figure
+surf(0:0.5:7.5,0:0.5:7.5,reshape([data(15).res.dist],16,16))
+shading interp
+view(2)
+axis([0 7.5 0 7.5])
+colorbar
+xlabel('X(m)')
+ylabel('Y(m)')
+title({'Error along XY plane';['Np = ' num2str(data(15).params.Np) ',Nm = '...
+    num2str(data(15).params.Nm) ',Mean = ' num2str(data(15).mean) ...
+    ' m, Psi = ' num2str(data(15).params.Psi) ', HPA =' num2str(HPA(data(15).params.m))]})
 
 
