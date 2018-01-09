@@ -104,7 +104,7 @@ for ix = 1:numel(xloc)
         
         for counter = 1:Nrep
             s = sqrt(Nu).*randn(size(Y));
-            Ynoise = Y ;%+ s;
+            Ynoise = Y + s;
             
             %             stemp(counter,:,:) = s;
             
