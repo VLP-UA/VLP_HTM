@@ -6,7 +6,11 @@ function [ res params] = shapeResults( resultsdir, resultfn, m, Np, Nm, Psi, Nre
 resultsfilename = createResultFilename( resultsdir, resultfn, m, Np, Nm, Psi, Nrep);
 
 if exist(resultsfilename) ~= 2
-  error('File "%s" not found! Check filename.\n',resultsfilename);
+  % Try with Psi in degrees
+  resultsfilename = createResultFilenamed( resultsdir, resultfn, m, Np, Nm, Psi, Nrep);
+  if exist(resultsfilename) ~= 2 
+    error('File "%s" not found! Check filename.\n',resultsfilename);
+  end
 end
 
 load(resultsfilename);

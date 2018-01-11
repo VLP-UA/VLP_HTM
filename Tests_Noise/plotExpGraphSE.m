@@ -16,7 +16,7 @@ expFilename = [ resultsdir resultsBaseFn '_data' ];
 %% 
 load (expFilename);
 
-restable = struct2table(testresults);
+% testresultstable = struct2table(testresults);
 
 % Test: Psi
 % Filter: m 
@@ -27,8 +27,8 @@ plotBaseFn = [resultsdir resultsBaseFn];
 for m = m_v
   
   % filter the table on m
-  ifx = restable.m==m;
-  filtered = restable(ifx,:);
+  ifx = testresultstable.m==m;
+  filtered = testresultstable(ifx,:);
   
   % Sort by Implicit and then by Test
   [x ix] = sort(filtered.Np);
@@ -43,7 +43,7 @@ for m = m_v
   nvalstest = numel(valstest);
   nvalsimpl = numel(valsimpl);
 
-  
+  keyboard
   % Plot location error
   % Create the array: 
   plotdata = reshape(filtered.locerrmax, nvalsimpl,nvalstest);
@@ -56,13 +56,13 @@ for m = m_v
   xlabel('Psi/deg')
   legend(num2str(NmNp(:,1)))
   
+  filename = [ plotBaseFn '_LocMaxErr_m_' num2str(m) '.png' ]
+  print(filename,'-dpng')
+  
   % Plot radius error
   % Create the array: 
   plotdata = reshape(filtered.raderrmax, nvalsimpl,nvalstest);
 
-  filename = [ plotBaseFn '_LocMaxErr_m_' num2str(m) '.png' ]
-  print(filename,'-dpng')
-  
   
   h = figure;
   plot(Psi_v*180/pi,plotdata','*-')
@@ -84,8 +84,8 @@ end
 for Psi = Psi_v
   
   % filter the table on m
-  ifx = restable.Psi==Psi;
-  filtered = restable(ifx,:);
+  ifx = testresultstable.Psi==Psi;
+  filtered = testresultstable(ifx,:);
   
   % Sort by Implicit and then by Test
   [x ix] = sort(filtered.Np);

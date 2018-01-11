@@ -3,8 +3,9 @@ function [ output_args ] = arrangeGraphsThreshold( hh, t )
 %   Detailed explanation goes here
 
 % For all graphs in hh
-for f = hh'
-
+%for f = hh(:)
+for i = 1:numel(hh)
+  f = hh(i);
   ax = ancestor(f,'axes');
   if( isempty(ax) == 0)
     colorbar(ax);

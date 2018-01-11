@@ -99,8 +99,8 @@ Z_p = 100e6*nRec_v;      % PD equivalent impedace = 100 MOhm
 
 %% Main cycle
 
-Wstep = W%/10;
-Lstep = L%/10;
+Wstep = W/10;
+Lstep = L/10;
 
 xloc = 0:Wstep:W;
 yloc = 0:Lstep:L;
@@ -117,7 +117,6 @@ for ix = 1:numel(xloc)
       tempSensor(i).HTM = Trans3(xloc(ix),yloc(iy),0)*PDSensor(i).HTM;
     end
     
-
     %  Compute received indication (mean and noise / variance)
     [ Y, nu ] = vlpRecIndication( Emitters, tempSensor, Bw, Z, s_i, s_v, Z_p, Theta );
     Nu = repmat(nu,1,n_Emitters);
