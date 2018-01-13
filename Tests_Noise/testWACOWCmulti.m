@@ -33,19 +33,26 @@ xloc = 0:Wstep:W;
 yloc = 0:Lstep:L;
 
 % Save experiment parameters
+% Room
 params.W = W;
 params.L = L;
 params.H = H;
 params.Wstep= Wstep;
 params.Lstep = Lstep;
 params.Nrep = Nrep;
+% Emitters
+params.n_L = n_L;
+params.n_W = n_W;
+params.n_Emitters = n_Emitters;
 params.HPA_v = HPA_v;
 params.m_v = m_v;
+% Sensor
 params.NmNp = NmNp;
 params.Psi_v = Psi_v;
+params.Psi_mode = Psi_mode;
+% Conditions
 params.rectifyIndication = rectifyIndication;
 params.validReadingThreshold = validReadingThreshold;
-params.Psi_mode = Psi_mode;
 params.resultsBaseFn = resultsBaseFn;
 
 % Create the results dir if necessary
@@ -82,12 +89,10 @@ for m = m_v
       case 1
         Psi_v = [ Psi_min (Psi_min + Psi_max)/2 Psi_max ];
       case 2
-        Psi_v =Psi_min *params.Psi_v;
+        Psi_v = Psi_min *params.Psi_v;
       otherwise
         error('Invalid value or undefined Psi_mode!');
     end
-    
-    params.Psi_v = Psi_v;
     
     for Psi=Psi_v
       
@@ -349,27 +354,14 @@ for m = m_v
             locerror = norm( RecXYLoc - location );
             locerrorv = [ locerrorv locerror ];
             
-            % Error in radius
-% % % %             actualRad = norm( [Sx Sy] - locEm(1:2) );
-% % % %             raderror = abs(actualRad - radii(1));
-% % % %             raderrorv = [ raderrorv raderror ];
-            
-            
           end
           
           % Compute and save experiment data
-          %results(ix,iy).validReading =
           results.locerroravg(ix,iy) = mean(locerrorv);
           results.locerrorstd(ix,iy) = std(locerrorv);
           results.locerrormax(ix,iy) = max(locerrorv);
           results.locerrorrms(ix,iy) = rms(locerrorv);
-          
-% % % %           results.raderroravg(ix,iy) = mean(raderrorv);
-% % % %           results.raderrorstd(ix,iy) = std(raderrorv);
-% % % %           results.raderrormax(ix,iy) = max(raderrorv);
-% % % %           results.raderrorrms(ix,iy) = rms(raderrorv);
-% % % %           
-          
+                    
         end
       end % end of room traveling
 
@@ -389,7 +381,7 @@ for m = m_v
       roomstats.locerrmax = max([results.locerrormax(:)]);
       roomstats.locerravg = mean([results.locerroravg(:)]);
       roomstats.locerrstd = std([results.locerrorstd(:)]);
-      roomstats.locerrrms = rms([results.locerrorstd(:)]);
+      roomstats.locerrrms = rms([results.locerrorrms(:)]);
       
            
       load(expFilename);

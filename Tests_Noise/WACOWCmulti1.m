@@ -58,7 +58,8 @@ NmNp = ...
   56 14
   60 15];
 
-Psi_v = [1 1.25 1.5 1.75 2 2.25 2.5 2.75 3 3.5 4 4.5 5];             % Hemi-Fov
+%Psi_v = [1 1.25 1.5 1.75 2 2.25 2.5 2.75 3 3.5 4 4.5 5];             % Hemi-Fov
+Psi_v = [1 2 3 4 5];
 Ar = 1e-6;              % Active receiving area
 Ts = 1;                 % Optical filter gain
 n = 1;                  % Receiver's internal refractive index

@@ -20,12 +20,14 @@ end
 for i = 1:numel(list)
   matfilename = list(i).name;
   [ff hh ]= plotErrSurface(matfilename,'rms',hideplot);
-  arrangeGraphsThreshold(hh,0.20);
+  arrangeGraphsThreshold(hh,0.50);
   dotpos = find((matfilename=='.'));
   pngfilename = [matfilename(1:dotpos) 'png'];
   print(ff(7),[matfilename(1:dotpos-1) '_loc.png'],'-dpng');
+  savefig(ff(7),[matfilename(1:dotpos-1) '_loc.fig']);
   if ff(8) ~= 0
     print(ff(8),[matfilename(1:dotpos-1) '_rad.png'],'-dpng');
+    savefig(ff(8),[matfilename(1:dotpos-1) '_rad.fig']);
   end
   if hideplot
     close(ff(7));

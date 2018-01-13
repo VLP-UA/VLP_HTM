@@ -1,4 +1,4 @@
-function [ output_args ] = arrangeGraphsThreshold( hh, t )
+  function [ output_args ] = arrangeGraphsThreshold( hh, t )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 

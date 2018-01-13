@@ -1,18 +1,23 @@
-function plotExpGraphSE1(experiment_data)
+function plotExpGraphSE1(experiment_name)
 
-run(experiment_data);
+% Load the experiment parameters
+% run(experiment_name);
 
 %% Files and folders
 
-% Folter for storing results
-resultsdir = 'results/';
+baseFileName = [ experiment_name '_data.mat' ];
+resultsdir = '';
 
-% Base filename
-resultsBaseFn = experiment_data;
+
+if exist(baseFileName) ~= 2
+  % if the file does not exist, try results/ subdir
+  % Folter for storing results
+  resultsdir = 'results/';
+end
+
 
 % Experimente results filename
-expFilename = [ resultsdir resultsBaseFn '_data' ];
-
+expFilename = [ resultsdir baseFileName ];
 
 load (expFilename);
 
@@ -21,7 +26,9 @@ Psi_v = params.Psi_v(:);
 
 % testresultstable = struct2table(testresults);
 
-plotBaseFn = [resultsdir resultsBaseFn];
+m_v = params.m_v;
+
+plotBaseFn = [resultsdir experiment_name];
 %% 
 % Test: Psi
 % Filter: m
@@ -62,14 +69,16 @@ for m = m_v
   
   h = figure;
   plot(Psi_v,plotdata','*-')
-  ylim([0 Inf])
+  ylim([0 1.1])
+  
   title(['location, rms error, m=' num2str(m) ', VRT=' num2str(params.validReadingThreshold) ])
   ylabel('rms error/m')
   xlabel('\Psi/\Psi_{min}')
   legend([ repmat('N_s=',size(Ns_v)) num2str(Ns_v) ]);
   
-  filename = [ plotBaseFn '_LocRMSErr_Psi_m_' num2str(m) '.png' ]
-  print(filename,'-dpng')
+  filename = [ plotBaseFn '_LocRMSErr_Psi_m_' num2str(m) '.png' ];
+  print(filename,'-dpng');
+
 
   if exist('filtered.raderrrms')
     % Plot radius error
@@ -87,6 +96,7 @@ for m = m_v
     
     filename = [ plotBaseFn '_RadRMSErr_Psi_m_' num2str(m) '.png' ]
     print(filename,'-dpng')
+    
   end
   
 end
@@ -111,6 +121,9 @@ for m = m_v
   % 3. Update table
   filtered.Psi = Psi_ratio;
   
+  shortlist = Psi_ratio==1 | Psi_ratio==2 | Psi_ratio==3 | Psi_ratio==4 | Psi_ratio==5;
+  
+  filtered = filtered(shortlist,:);
   
   % Sort by Implicit and then by Test
   [x ix] = sort(filtered.Psi);
@@ -130,16 +143,26 @@ for m = m_v
   plotdata = reshape(filtered.locerrrms, nvalsimpl,nvalstest);
   
   h = figure;
-  plot(Ns_v,plotdata','*-')
-  ylim([0 Inf])
-  title(['location, rms error, m=' num2str(m) ', VRT=' num2str(params.validReadingThreshold) ])
+  plot(params.NmNp(:,2),plotdata','*-')
+  ylim([0 1.1])
+  
+  % Handle legacy error on variable name
+  if isfield(params,'N_L')
+    params.n_L = params.N_L;
+    params.n_W = params.N_W;
+  end
+
+  title(['Positioning r.m.s. error (' ...
+    num2str(params.n_W) 'x' num2str(params.n_L) ') light sources' ]);
   ylabel('rms error/m')
-  xlabel('# of photo-detectors')
-  legend([ repmat('\Psi_r=',size(Psi_v)) num2str(Psi_v) ]);
+  xlabel('# of parallels')
+  legend([ repmat('\Psi_r=',size(valsimpl)) num2str(valsimpl) ]);
+  grid on
   
-  filename = [ plotBaseFn '_LocRMSErr_Ns_m_' num2str(m) '.png' ]
+  filename = [ plotBaseFn '_LocRMSErr_Ns_m_' num2str(m) '.png' ];
   print(filename,'-dpng')
-  
+  % createfigureWACOWCpos(params.NmNp(:,2),plotdata');
+
   if exist('filtered.raderrrms')
     % Plot radius error
     % Create the array:
@@ -156,6 +179,8 @@ for m = m_v
     
     filename = [ plotBaseFn '_RadRMSErr_Ns_m_' num2str(m) '.png' ]
     print(filename,'-dpng')
+    
+    
   end
 end
 
