@@ -1,3 +1,5 @@
+%VLPRECINDICATIONVERIFY Short example of vlpRecIndication usage
+
 addpath ../ProjGeom/
 
 n_Em = 4;

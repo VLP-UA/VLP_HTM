@@ -1,10 +1,9 @@
-% Demonstrates the usage of HTM based VLP code
-% (Animated version of demo1)
+% Animated demo of HTM based VLP simulation code
 % 
 % The script will create an array of emitters and a VLP sensor.
 %
-% It then plots the received intensity at the sensor when the sensor is
-% displaced.
+% It then plots the received intensity at the sensor as the sensor travels
+% accross the room space.
 % 
 
 
@@ -35,7 +34,7 @@ R = 1;                  % Receiver's responsivity
 %% Create and populate data structures
 
 % Create the emitters array:
-Emitters = newEmitters(n_Emitters,Pt, m);
+Emitters = newEmitters(n_Emitters,Pt,Pt,m);
 
 % Create the receiver structure:
 Receivers = newReceivers(n_Receivers,Ar, Ts, n, Psi, R);
@@ -70,7 +69,7 @@ F = EmitRec2F(Emitters, PDSensor);
 
 %% Compute the received power
 
-Pt_v = [Emitters.Pt]';
+Pt_v = [Emitters.Pb]';
 Pr = A*F*B*Pt_v;
 
 % Get the max value. It will be used for scaling the received power
@@ -126,7 +125,7 @@ for position=1:60
     F = EmitRec2F(Emitters, PDSensor);
     
     % Compute received power
-    Pt_v = [Emitters.Pt]';
+    Pt_v = [Emitters.Pb]';
     Pr = A*F*B*Pt_v;
 
     % Get the new max valuefor scaling the received power plot

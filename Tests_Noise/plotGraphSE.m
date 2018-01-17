@@ -1,5 +1,5 @@
 function [hh] = plotGraphSE( resultsdir, resultfn, m, Np, Nm, Psi, Nrep, varargin)
-%PLOTGRAHSE Plots the graphs from single emitter using data in file
+%PLOTGRAPHSE Plots the graphs from single emitter using data in file
 %
 % plotGraphSE( resultsdir, resultfn, m, Np, Nm, Psi, Nrep)
 % plotGraphSE( resultsdir, resultfn, m, Np, Nm, Psi, Nrep,t)

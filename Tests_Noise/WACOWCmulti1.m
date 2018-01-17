@@ -1,3 +1,4 @@
+% Parameter set #1 for testWACOWCmulti
 
 % General conditions:
 interactive = 0;

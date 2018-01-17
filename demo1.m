@@ -2,8 +2,8 @@
 % 
 % The script will create an array of emitters and a VLP sensor.
 %
-% It then plots the received intensity at the sensor when the sensor is
-% displaced.
+% It then plots the received intensity with the sensor at different
+% location in the room's floor.
 
 %% Prepare the workspace
 
@@ -14,7 +14,7 @@ addpath('../ProjGeom');
 
 % Emitters
 n_Emitters = 3;         % Number of emitters
-Pt = 1 ;                % Transmitted power
+Pb = 1 ;                % Transmitted power
 m = 5 ;                 % Lambertian mode number
 
 % Receivers:
@@ -32,7 +32,7 @@ Psi = pi/4;             % Hemi-Fov
 %% Create and populate data structures
 
 % Create the emitters array:
-Emitters = newEmitters(n_Emitters,Pt, m);
+Emitters = newEmitters(n_Emitters,Pb,0,m);
 
 % Create the receiver structure:
 Receivers = newReceivers(n_Receivers,Ar, Ts, n, Psi, R);
@@ -66,7 +66,7 @@ F = EmitRec2F(Emitters, PDSensor);
 
 %% Compute the received power
 
-Pt_v = [Emitters.Pt]';
+Pt_v = [Emitters.Pb]';
 Pr = A*F*B*Pt_v;
 
 % Get the max value. It will be used for scaling the received power
@@ -118,7 +118,7 @@ for position=1:3
     F = EmitRec2F(Emitters, PDSensor);
     
     % Compute received power
-    Pt_v = [Emitters.Pt]';
+    Pt_v = [Emitters.Pb]';
     Pr = A*F*B*Pt_v;
 
     % Get the new max valuefor scaling the received power plot

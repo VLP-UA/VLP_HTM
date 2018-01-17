@@ -1,5 +1,5 @@
 function createfigureWACOWCpos(X1, YMatrix1)
-%CREATEFIGURE(X1, YMATRIX1)
+%CREATEFIGUREWACOWCPOS Formats graphs for WACOWC 2018 paper
 %  X1:  vector of x data
 %  YMATRIX1:  matrix of y data
 

@@ -1,5 +1,5 @@
 %% General conditions:
-interactive = 0;
+interactive = 1;
 usegraphics = 1;
 
 % when rectifyIndication==1, the transimpedance

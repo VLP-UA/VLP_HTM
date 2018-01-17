@@ -1,5 +1,9 @@
 function testWACOWCmulti(experiment_name)
+% testWACOWCmulti Simulation of VLP "naive" algorithm in a room.
 %
+%   testWACOWCmulti(experiment_name)
+%
+%   experiment_name is the basename of a M-file containing the experiment parameters.  
 
 %% Prepare the workspace
 

@@ -1,5 +1,5 @@
 function testWACOWC(experiment_name)
-%
+% TESTWACOWC Run simulation with a single emitter to get reading accuracy data
 
 %% Prepare the workspace
 

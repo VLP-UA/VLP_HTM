@@ -1,4 +1,10 @@
 function tests = newEmittersTest
+%NEWEMITTERSTEST UnitTests for newEmitters()
+%
+%   To run the tests: 
+%   >> run(newEmittersTest)
+%
+%   see https://www.mathworks.com/help/matlab/matlab_prog/write-function-based-unit-tests-.html
 tests = functiontests(localfunctions);
 end
 

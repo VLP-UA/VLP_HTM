@@ -1,5 +1,5 @@
 function [ ff hh ] = plotErrSurface( filename , varargin )
-%PLOTERRSURFACE Creates surface plots from error data in filename
+%PLOTERRSURFACE Creates surface plots from one single experiment
 %   plotErrSurface(filename, plotspec, hidden)
 %   plotErrSurface(filename, plotspec)
 %   plotErrSurface(filename)
