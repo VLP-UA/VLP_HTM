@@ -1,4 +1,5 @@
 function plotExpGraphSE(experiment_data)
+%PLOTEXPGRAPHSE (testWACOW) Plots the graphs with overall data
 
 run(experiment_data);
 
@@ -41,9 +42,9 @@ for m = m_v
   valsimpl = unique(filtered.Np);
   
   nvalstest = numel(valstest);
+  nvalstest = numel(Psi_v);
   nvalsimpl = numel(valsimpl);
 
-  keyboard
   % Plot location error
   % Create the array: 
   plotdata = reshape(filtered.locerrmax, nvalsimpl,nvalstest);
@@ -81,9 +82,24 @@ end
 % Filter: Psi 
 % Implicit: Np/Nm
 
+if Psi_mode == 2
+  % Rearrange Psi values
+  % Psi values are a function of Np. Replace actual values by the ratio
+  % Psi/Psi_min
+  % 1. Get the values for corresponding Phi_min
+  Psi_min = 0.5*acos(cos(pi./(2*testresultstable.Np)).^2);
+  % 2. Compute the ratio Psi/Psi_min
+  Psi_ratio = round(testresultstable.Psi ./ Psi_min,2);
+  % 3. Update table
+  testresultstable.Psi = Psi_ratio;
+end
+
+
 for Psi = Psi_v
+  Psi
   
-  % filter the table on m
+
+  % filter the table on Psi
   ifx = testresultstable.Psi==Psi;
   filtered = testresultstable(ifx,:);
   
@@ -100,7 +116,6 @@ for Psi = Psi_v
   nvalstest = numel(valstest);
   nvalsimpl = numel(valsimpl);
 
-  
   % Plot location error
   % Create the array: 
   plotdata = reshape(filtered.locerrmax, nvalsimpl,nvalstest);

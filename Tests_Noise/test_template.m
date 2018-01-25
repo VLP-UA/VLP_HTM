@@ -1,3 +1,5 @@
+%% Template for a simulation test
+
 % Prepare the workspace
 
 clear all;

@@ -1,9 +1,13 @@
 function testWACOWCmulti(experiment_name)
-% testWACOWCmulti Simulation of VLP "naive" algorithm in a room.
+% TESTWACOWCMULTI Simulation of VLP "naive" algorithm in a room.
 %
-%   testWACOWCmulti(experiment_name)
+%   TESTWACOWCMULTI(experiment_name)
 %
-%   experiment_name is the basename of a M-file containing the experiment parameters.  
+%   experiment_name is the basename of a M-file containing the experiment
+%   parameters.
+%   
+%   TESTWACOWCMULTI should be the first script to be called. It computes
+%   the data to be used by the plot creation functions. 
 
 %% Prepare the workspace
 

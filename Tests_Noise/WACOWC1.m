@@ -53,4 +53,4 @@ R = 1;                  % Receiver's responsivity
 
 validReadingThreshold = 8-Inf;
 
-
+Psi_mode = 1;
