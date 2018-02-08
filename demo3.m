@@ -1,6 +1,12 @@
-% Demonstrates the usage of HTM based VLP code
+% DEMO3 Interactive demo showing noise effects
 % 
-% 
+%   Displays a set of emitters at the ceiling and the value of the detected
+%   power by a meridian/parallel sensor. The optical power received at each
+%   photodiode is represented by the length of the vector in its position.
+%
+%   The value of the received power at each photodiode is a stochastic
+%   variable. Every time the user presses the key [ENTER], a new value for
+%   the stochastic variable is extracted and the plot is created. 
 % 
 
 % Prepare the workspace

@@ -3,11 +3,15 @@ function [ displacedSensor ] = vlpMoveSensor( originalSensor , displHTM )
 %   displacedSensor = vlpMoveSensor( originalSensor , displHTM )
 %
 %   The sensor is an array of Emitter_t structs. The sensors in the array
-%   are displace (translated and rotated) by the transformation defined in
+%   are displaced (translated and/or rotated) by the transformation defined in
 %   the Homogeneous Transformation Matrix displHTM
+%
+%   VLPMOVESENSOR applies the transformation displHTM to all HTMs of the
+%   sensors in the originalSensor structure. 
 
 
 % This is the non-optimized version
+% TODO: verify if vectorization can improve timing. 
 
 displacedSensor = originalSensor;
 

@@ -1,6 +1,5 @@
 function [ h ] = drawCircleAtH( Cx, Cy, H, R )
-%DRAWDIRCLEATH Draw a circle at height H, centered in Cx,Cy with radius R
-%   Detailed explanation goes here
+%DRAWCIRCLEATH Draw a circle at height H, centered in Cx,Cy with radius R
 
 theta = linspace(0,2*pi);
 

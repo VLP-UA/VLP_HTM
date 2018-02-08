@@ -1,5 +1,5 @@
-function test_single_em(experiment_name)
-%
+function testWACOWC(experiment_name)
+% TESTWACOWC Run simulation with a single emitter to get reading accuracy data
 
 %% Prepare the workspace
 
@@ -22,7 +22,7 @@ resultsdir = 'results/';
 % Base filename
 resultsBaseFn = experiment_name;
 
-% Experimente results filename 
+% Experimente results filename
 expFilename = [ resultsdir resultsBaseFn '_data' ];
 
 
@@ -40,10 +40,12 @@ params.Wstep= Wstep;
 params.Lstep = Lstep;
 params.Nrep = Nrep;
 params.HPA_v = HPA_v;
+params.m_v = m_v;
 params.NmNp = NmNp;
 params.Psi_v = Psi_v;
 params.rectifyIndication = rectifyIndication;
 params.validReadingThreshold = validReadingThreshold;
+params.Psi_mode = Psi_mode;
 params.resultsBaseFn = resultsBaseFn;
 
 % Create the results dir if necessary
@@ -70,19 +72,32 @@ end
 
 
 for m = m_v
-  for Psi=Psi_v
-    for iConfig = 1:size(NmNp,1)
-      
-      Nm = NmNp(iConfig,1);
-      Np = NmNp(iConfig,2);
+  for iConfig = 1:size(NmNp,1)
+    
+    Nm = NmNp(iConfig,1);
+    Np = NmNp(iConfig,2);
+    Psi_min = 0.5*acos(cos(pi/(2*Np))^2);
+    Psi_max = pi/(2*Np);
+    switch Psi_mode
+      case 1
+        Psi_v = [ Psi_min (Psi_min + Psi_max)/2 Psi_max ];
+      case 2
+        Psi_v =Psi_min *params.Psi_v;
+      otherwise
+        error('Invalid value or undefined Psi_mode!');
+    end
+    
+    params.Psi_v = Psi_v;
+    
+    for Psi=Psi_v
       
       if(leaving==1)
         break;
       end
       
-      [ '\{m, N_p, N_m, \Psi \}=\{' num2str(m) ',' ...
+      disp([ '{m, N_p, N_m, Psi }={' num2str(m) ',' ...
         num2str(Np) ',' num2str(Nm) ',' ...
-        num2str(round(180/pi*Psi)) '\}']
+        num2str(round(180/pi*Psi)) '}']);
       
       %% Create the light emitters
       
@@ -204,6 +219,13 @@ for m = m_v
             s = sqrt(Nu).*randn(size(Y));
             Ynoise = Y + s;
             
+            % If variable nonoise exists and if it is set, shut down noise
+            if exist('nonoise')
+              if nonoise
+                Ynoise = Y;
+              end
+            end
+            
             % If rectifyIndication is active, negative values are clipped
             % at zero:
             if rectifyIndication
@@ -302,26 +324,29 @@ for m = m_v
             raderror = abs(actualRad - radii(1));
             raderrorv = [ raderrorv raderror ];
             
-
+            
           end
           
           % Compute and save experiment data
-          %results(ix,iy).validReading = 
-          results(ix,iy).locerroravg = mean(locerrorv);
-          results(ix,iy).locerrorstd = std(locerrorv);
-          results(ix,iy).locerrormax = max(locerrorv);
+          %results(ix,iy).validReading =
+          results.locerroravg(ix,iy) = mean(locerrorv);
+          results.locerrorstd(ix,iy) = std(locerrorv);
+          results.locerrormax(ix,iy) = max(locerrorv);
+          results.locerrorrms(ix,iy) = rms(locerrorv);
           
-          results(ix,iy).raderroravg = mean(raderrorv);
-          results(ix,iy).raderrorstd = std(raderrorv);
-          results(ix,iy).raderrormax = max(raderrorv);
+          results.raderroravg(ix,iy) = mean(raderrorv);
+          results.raderrorstd(ix,iy) = std(raderrorv);
+          results.raderrormax(ix,iy) = max(raderrorv);
+          results.raderrorrms(ix,iy) = rms(raderrorv);
           
-          resultsfilename = createResultFilename( resultsdir, ...
-            resultsBaseFn, m, Np, Nm, Psi, Nrep);          
-          save(resultsfilename,'params','results');
           
         end
       end % end of room traveling
-      
+
+      resultsfilename = createResultFilename( resultsdir, ...
+        resultsBaseFn, m, Np, Nm, Psi, Nrep);
+      save(resultsfilename,'params','results');
+
       
       %% Compute and save full area aggregate results
       %
@@ -331,13 +356,16 @@ for m = m_v
       roomstats.Np = Np;
       roomstats.Nm = Nm;
       
-      roomstats.locerrmax = max([results.locerrormax]);
-      roomstats.locerravg = mean([results.locerroravg]);
-      roomstats.locerrstd = max([results.locerrorstd]);
-
-      roomstats.raderrmax = max([results.raderrormax]);
-      roomstats.raderravg = mean([results.raderroravg]);
-      roomstats.raderrstd = max([results.raderrorstd]);
+      roomstats.locerrmax = max([results.locerrormax(:)]);
+      roomstats.locerravg = mean([results.locerroravg(:)]);
+      roomstats.locerrstd = std([results.locerrorstd(:)]);
+      roomstats.locerrrms = rms([results.locerrorstd(:)]);
+      
+      
+      roomstats.raderrmax = max([results.raderrormax(:)]);
+      roomstats.raderravg = mean([results.raderroravg(:)]);
+      roomstats.raderrstd = std([results.raderrorstd(:)]);
+      roomstats.raderrrms = rms([results.raderrorstd(:)]);
       
       load(expFilename);
       % Add to array with all test results
@@ -346,7 +374,7 @@ for m = m_v
       
       % Save the experiment results
       save(expFilename,'testresults','testresultstable','params');
-
+      
       
       
       %% Close the iteration over the experiment conditions

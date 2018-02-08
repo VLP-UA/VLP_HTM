@@ -1,5 +1,13 @@
-function test_single_em(experiment_name)
+function testWACOWCmulti(experiment_name)
+% TESTWACOWCMULTI Simulation of VLP "naive" algorithm in a room.
 %
+%   TESTWACOWCMULTI(experiment_name)
+%
+%   experiment_name is the basename of a M-file containing the experiment
+%   parameters.
+%   
+%   TESTWACOWCMULTI should be the first script to be called. It computes
+%   the data to be used by the plot creation functions. 
 
 %% Prepare the workspace
 
@@ -22,7 +30,7 @@ resultsdir = 'results/';
 % Base filename
 resultsBaseFn = experiment_name;
 
-% Experimente results filename 
+% Experimente results filename
 expFilename = [ resultsdir resultsBaseFn '_data' ];
 
 
@@ -33,15 +41,24 @@ xloc = 0:Wstep:W;
 yloc = 0:Lstep:L;
 
 % Save experiment parameters
+% Room
 params.W = W;
 params.L = L;
 params.H = H;
 params.Wstep= Wstep;
 params.Lstep = Lstep;
 params.Nrep = Nrep;
+% Emitters
+params.n_L = n_L;
+params.n_W = n_W;
+params.n_Emitters = n_Emitters;
 params.HPA_v = HPA_v;
+params.m_v = m_v;
+% Sensor
 params.NmNp = NmNp;
 params.Psi_v = Psi_v;
+params.Psi_mode = Psi_mode;
+% Conditions
 params.rectifyIndication = rectifyIndication;
 params.validReadingThreshold = validReadingThreshold;
 params.resultsBaseFn = resultsBaseFn;
@@ -70,33 +87,45 @@ end
 
 
 for m = m_v
-  for Psi=Psi_v
-    for iConfig = 1:size(NmNp,1)
-      
-      Nm = NmNp(iConfig,1);
-      Np = NmNp(iConfig,2);
+  for iConfig = 1:size(NmNp,1)
+    
+    Nm = NmNp(iConfig,1);
+    Np = NmNp(iConfig,2);
+    Psi_min = 0.5*acos(cos(pi/(2*Np))^2);
+    Psi_max = pi/(2*Np);
+    switch Psi_mode
+      case 1
+        Psi_v = [ Psi_min (Psi_min + Psi_max)/2 Psi_max ];
+      case 2
+        Psi_v = Psi_min *params.Psi_v;
+      otherwise
+        error('Invalid value or undefined Psi_mode!');
+    end
+    
+    for Psi=Psi_v
       
       if(leaving==1)
         break;
       end
       
-      [ '\{m, N_p, N_m, \Psi \}=\{' num2str(m) ',' ...
+      disp([ '{m, N_p, N_m, Psi }={' num2str(m) ',' ...
         num2str(Np) ',' num2str(Nm) ',' ...
-        num2str(round(180/pi*Psi)) '\}']
+        num2str(round(180/pi*Psi)) '}']);
       
       %% Create the light emitters
       
       Emitters = newEmitters(n_Emitters,Pb,Ps,m);
       
       % Emitter location in xy plane
-      locEm = [ W/2 L/2 H ];
-      Em_Base_HTM = Trans3( locEm' )*RotX3(pi);      % Base HTM at the center of the ceiling.
+      locEm = [ 0 0 H ];
+      Em_Base_HTM = Trans3( locEm' )*RotX3(pi);      % Base HTM at (0,0), on the ceiling.
       
-      % Light emitters placed at ceiling, in a circle of radius R
-      Rs = 0;
-      for i=1:n_Emitters
-        Emitters(i).HTM = Em_Base_HTM*RotZ3(i*(2*pi)/n_Emitters)*...
-          Trans3(Rs,0,0)*RotY3(0*pi/8);
+      delta_W = W/(n_W+1);
+      delta_L = L/(n_L+1);
+      for i=1:n_W
+        for j = 1:n_L
+          Emitters(j+(i-1)*n_L).HTM = Trans3(i*delta_W,j*delta_L,0)*Em_Base_HTM;
+        end
       end
       
       if usegraphics
@@ -164,6 +193,9 @@ for m = m_v
       params.m = m;
       params.Pb = Pb;
       params.Ps = Ps;
+      params.n_L = n_L;
+      params.n_W = n_W;
+      params.n_Emitters = n_Emitters;
       
       % Receiver data
       params.Np = Np;
@@ -204,6 +236,13 @@ for m = m_v
             s = sqrt(Nu).*randn(size(Y));
             Ynoise = Y + s;
             
+            % If variable nonoise exists and if it is set, shut down noise
+            if exist('nonoise')
+              if nonoise
+                Ynoise = Y;
+              end
+            end
+            
             % If rectifyIndication is active, negative values are clipped
             % at zero:
             if rectifyIndication
@@ -237,9 +276,38 @@ for m = m_v
               radii = NaN;
             end
             
+      
+            
+            % recP holds the total power received from each emitter
+            recP = sqrt(sum(Ynoise.*Ynoise));
+            
+            % Criteria for accepting the location data
+            accepted=zeros(1,n_Emitters);
+            mrecP = mean(recP);
+            while(sum(accepted) <4)
+              accepted = recP > mrecP;
+              mrecP = 0.98*mrecP;
+            end
+            
             % Get the emitters position
             temp = [Emitters.HTM];
             posEm = temp(1:2,4:4:end);
+            %Consider only accepted positions
+            posEm_ac = posEm(:,accepted);
+            
+            % Consider only accepted radii
+            radii_ac = radii(accepted);
+            
+            Xx = posEm_ac(1,:);
+            Yy = posEm_ac(2,:);
+            
+            A=[ Xx(2:end)'-Xx(1) Yy(2:end)'-Yy(1)];
+            B=0.5*((radii_ac(1)^2-radii_ac(2:end)'.^2) + (Xx(2:end)'.^2+Yy(2:end)'.^2) - (Xx(1)^2 + Yy(1)^2));
+            %A
+            %B
+            %accepted
+            location = (A'*A)^(-1)*A'*B;
+            % location=[0 0]';
             
             % Compute the true value for radii
             delta = posEm - repmat([xloc(ix);yloc(iy)],1,n_Emitters);
@@ -258,22 +326,17 @@ for m = m_v
             Py = Mvec(2,1);
             Pz = Mvec(3,1);
             
-            % Compute estimated location of emitter
-            if validReading
-              locEmEstim = [ Sx Sy Sz] + [ Px Py Pz]*H/Pz;
-            else
-              locEmEstim = [NaN NaN NaN];
-            end
             
             if usegraphics
-              % Plot the estimated point vector
-              hpv = quiver3(Sx,Sy,Sz,2*Px,2*Py,2*Pz,'m','LineWidth',2);
               
-              % Plot the circle
-              hcirc = drawCircleAtH(Sx,Sy,H,radii(1));
+              hcirc = zeros(size(radii));
+              % Plot the circles
+              for cc = 1:numel(radii)
+                hcirc(i) = drawCircleAtH(Sx,Sy,H,radii(cc));
+              end
               
               % Plot the estimated location of emitter in the ceiling
-              hlem = plot3(locEmEstim(1),locEmEstim(2),locEmEstim(3),'om');
+              hlem = plot3(location(1),location(2),H,'om');
               
               if interactive == 1
                 resp = input('[ENTER] to continue, any value to stop...','s');
@@ -283,45 +346,37 @@ for m = m_v
                   break;
                 end
               else
-                pause(.1);
+                pause(.01);
               end
               
-              delete(hpv);
               delete(hcirc);
               delete(hlem);
             end
             
+                        
             % Compute errors
+            % Receiver location:
+            RecXYLoc = [Sx ; Sy ];
             
             % Error on estimation of emitter localization in xy plane
-            locerror = norm( locEm(1:2) - locEmEstim(1:2) );
+            locerror = norm( RecXYLoc - location );
             locerrorv = [ locerrorv locerror ];
             
-            % Error in radius
-            actualRad = norm( [Sx Sy] - locEm(1:2) );
-            raderror = abs(actualRad - radii(1));
-            raderrorv = [ raderrorv raderror ];
-            
-
           end
           
           % Compute and save experiment data
-          %results(ix,iy).validReading = 
-          results(ix,iy).locerroravg = mean(locerrorv);
-          results(ix,iy).locerrorstd = std(locerrorv);
-          results(ix,iy).locerrormax = max(locerrorv);
-          
-          results(ix,iy).raderroravg = mean(raderrorv);
-          results(ix,iy).raderrorstd = std(raderrorv);
-          results(ix,iy).raderrormax = max(raderrorv);
-          
-          resultsfilename = createResultFilename( resultsdir, ...
-            resultsBaseFn, m, Np, Nm, Psi, Nrep);          
-          save(resultsfilename,'params','results');
-          
+          results.locerroravg(ix,iy) = mean(locerrorv);
+          results.locerrorstd(ix,iy) = std(locerrorv);
+          results.locerrormax(ix,iy) = max(locerrorv);
+          results.locerrorrms(ix,iy) = rms(locerrorv);
+                    
         end
       end % end of room traveling
-      
+
+      resultsfilename = createResultFilename( resultsdir, ...
+        resultsBaseFn, m, Np, Nm, Psi, Nrep);
+      save(resultsfilename,'params','results');
+
       
       %% Compute and save full area aggregate results
       %
@@ -331,14 +386,12 @@ for m = m_v
       roomstats.Np = Np;
       roomstats.Nm = Nm;
       
-      roomstats.locerrmax = max([results.locerrormax]);
-      roomstats.locerravg = mean([results.locerroravg]);
-      roomstats.locerrstd = max([results.locerrorstd]);
-
-      roomstats.raderrmax = max([results.raderrormax]);
-      roomstats.raderravg = mean([results.raderroravg]);
-      roomstats.raderrstd = max([results.raderrorstd]);
+      roomstats.locerrmax = max([results.locerrormax(:)]);
+      roomstats.locerravg = mean([results.locerroravg(:)]);
+      roomstats.locerrstd = std([results.locerrorstd(:)]);
+      roomstats.locerrrms = rms([results.locerrorrms(:)]);
       
+           
       load(expFilename);
       % Add to array with all test results
       testresults = [ testresults; roomstats ];
@@ -346,7 +399,7 @@ for m = m_v
       
       % Save the experiment results
       save(expFilename,'testresults','testresultstable','params');
-
+      
       
       
       %% Close the iteration over the experiment conditions
