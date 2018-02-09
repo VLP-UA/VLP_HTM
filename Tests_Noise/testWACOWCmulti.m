@@ -369,13 +369,21 @@ for m = m_v
           results.locerrorstd(ix,iy) = std(locerrorv);
           results.locerrormax(ix,iy) = max(locerrorv);
           results.locerrorrms(ix,iy) = rms(locerrorv);
-                    
+               
+          % Radii export struture
+          % radii is the estimated distance to each emitter
+          % Add computed radii to export structure
+          export_radii(ix,iy).computed_radii = radii;
+          export_radii(ix,iy).accepted_radii = radii_ac;
+          export_radii(ix,iy).true_radii = trueradii;
+          
+          
         end
       end % end of room traveling
 
       resultsfilename = createResultFilename( resultsdir, ...
         resultsBaseFn, m, Np, Nm, Psi, Nrep);
-      save(resultsfilename,'params','results');
+      save(resultsfilename,'params','results', 'export_radii');
 
       
       %% Compute and save full area aggregate results
