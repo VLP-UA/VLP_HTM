@@ -249,8 +249,9 @@ for m = m_v
               Ynoise = max(Y+s,zeros(size(Y)));
             end
             
-            % Check for valid reading
-            validReading = (max(Ynoise)/std(Ynoise) > validReadingThreshold);
+            % Check for valid reading for photodiode
+            % *1 to convert to double
+            validReading = (Ynoise >  validReadingThreshold.*sqrt(Nu))*1;
             
             
             % Get a matrix with all HTMs, side-by-side
@@ -258,7 +259,8 @@ for m = m_v
             E = x(1:3,3:4:end);
             
             % Mvec is a matrix with the vectors pointing to the light sources
-            Mvec = E*Ynoise;
+            tempYnoise = Ynoise.*validReading;
+            Mvec = E*tempYnoise;
             % Normalize Mvec
             Mvec = Mvec./repmat(sqrt(sum(Mvec.^2)),3,1);
             
@@ -270,11 +272,11 @@ for m = m_v
             vangles = acos(Mvec(3,:));
             
             % Compute the distances to light sources in the xy plane
-            if validReading
+%             if validReading
               radii = H*tan(vangles);
-            else
-              radii = NaN;
-            end
+%             else
+%               radii = NaN;
+%             end
             
       
             

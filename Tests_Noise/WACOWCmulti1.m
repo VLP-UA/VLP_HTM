@@ -66,6 +66,6 @@ Ts = 1;                 % Optical filter gain
 n = 1;                  % Receiver's internal refractive index
 R = 1;                  % Receiver's responsivity
 
-validReadingThreshold = -Inf;
+validReadingThreshold = 1;%100*Nu % -Inf;
 
 Psi_mode = 2;         % Use FOVmax = 2*FOVmin
