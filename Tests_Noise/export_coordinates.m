@@ -1,14 +1,25 @@
+%% add the path to the projective geometry functions
+addpath('../../ProjGeom');
+addpath('../');
+
+clear all;
+clc;
+
+
 %% export from raw data to xy coordinates
 
 experiment_number=  2;%1 to 4
+test_number = 50 ; % 1 to 65 -> information about the test in the params structure
 
 load(['results/data_WACOWCmulti' num2str(experiment_number) '.mat'])
 
-
-temp_data = data(50);
-
+temp_data = data(test_number);
+% Params Structure
 params = temp_data.params;
 
+% Grouping parameters
+Ng = 3; % number of emitters in the group
+use_average=1; % set to one to use the average of params.Nrep repetitions
 
 %% generate emitters from params
 %%Create the light emitters
@@ -26,48 +37,55 @@ end
 
 
 
+%% Iterate over the xy plane and aggregate the emmiters into groups
+
+
 for xi=1: size(temp_data.export_radii,1)
     for yi=1: size(temp_data.export_radii,2)
         
+        %extract variables from structure for easier handling
         export = temp_data.export_radii(xi,yi);
-
+        
         radii_all = export.computed_radii;
-
-
-        combi= nchoosek([1:numel(export.computed_radii)],9);
-
-        loc_out=[];
+        power = export.rec_power;
+        
+        if(use_average)
+            radii_all_ave = export.average_radii;
+            power_average = export.average_rec_power;
+        end
+        
+        %generate the combination of N
+        combi= nchoosek([1:params.n_Emitters],Ng);
+        
+        
+        loc_xy=[];
+        loc_ave_xy = [];
+        power_xy =[];
+        power_xy_ave=[];
+        % Calculate an estimate for each group of photodiodes
         for i =1:size(combi,1)
             radii = radii_all(combi(i,:));
-
-            % Get the emitters position
-            temp = [Emitters.HTM];
-            pos_Em = temp(1:2,4:4:end);
-            %Consider only accepted positions
-            pos_Em=pos_Em(:,combi(i,:));
-            % pos_Em = posEm(:,accepted);
-
-            Xx = pos_Em(1,:);
-            Yy = pos_Em(2,:);
-
-            A=[ Xx(2:end)'-Xx(1) Yy(2:end)'-Yy(1)];
-            B=0.5*((radii(1)^2-radii(2:end)'.^2) + (Xx(2:end)'.^2+Yy(2:end)'.^2) - (Xx(1)^2 + Yy(1)^2));
-
-            location = (A'*A)^(-1)*A'*B;
             
-            loc_out = [loc_out location];
-            scattered_data(xi,yi).locations = loc_out;
+            location = trilateration_group_em(Emitters(combi(i,:)), radii);
+            loc_xy = [loc_xy location];
+            power_xy = [power_xy sum(power(combi(i,:)))];
+            
+            if(use_average)
+                radii_ave = radii_all_ave(combi(i,:));
+                location_average = trilateration_group_em(Emitters(combi(i,:)), radii_ave);
+                loc_ave_xy = [loc_ave_xy location_average];
+                power_xy_ave = [power_xy_ave sum(power_average(combi(i,:))) ];
+            end
+            
+            
+        end
+        
+        location_xy_plane(xi,yi).locations = loc_xy;
+        location_xy_plane(xi,yi).power = power_xy;
+        
+        if(use_average)
+            location_xy_plane(xi,yi).power_ave= power_xy_ave;
+            location_xy_plane(xi,yi).location_ave = loc_ave_xy;
         end
     end
-    
 end
-
-
-% plot(loc_out(1,:),loc_out(2,:),'*');
-
-
-
-
-
-
-
