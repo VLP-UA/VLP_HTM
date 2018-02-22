@@ -230,6 +230,10 @@ for m = m_v
           locerrorv = [];
           raderrorv = [];
           
+          % Initialize average variables
+          export_radii(ix,iy).average_radii= 0;
+          export_radii(ix,iy).average_rec_power = 0;
+          
           % Iterate
           for counter = 1:Nrep
             
@@ -259,8 +263,9 @@ for m = m_v
             E = x(1:3,3:4:end);
             
             % Mvec is a matrix with the vectors pointing to the light sources
-            tempYnoise = Ynoise.*validReading;
-            Mvec = E*tempYnoise;
+            filtered_Ynoise = Ynoise.*validReading;
+            
+            Mvec = E*filtered_Ynoise;
             % Normalize Mvec
             Mvec = Mvec./repmat(sqrt(sum(Mvec.^2)),3,1);
             
@@ -364,6 +369,10 @@ for m = m_v
             locerror = norm( RecXYLoc - location );
             locerrorv = [ locerrorv locerror ];
             
+            % Add current repetition for later average calcualtion
+            export_radii(ix,iy).average_radii= export_radii(ix,iy).average_radii + radii;
+            export_radii(ix,iy).average_rec_power = export_radii(ix,iy).average_rec_power + filtered_Ynoise;
+          
           end
           
           % Compute and save experiment data
@@ -376,10 +385,14 @@ for m = m_v
           % radii is the estimated distance to each emitter
           % Add computed radii to export structure
           export_radii(ix,iy).computed_radii = radii;
-          export_radii(ix,iy).accepted_radii = radii_ac;
+          export_radii(ix,iy).average_radii = export_radii(ix,iy).average_radii/params.Nrep;
           export_radii(ix,iy).true_radii = trueradii;
           
-          
+          % Reusing the strucutre to also export the recieved power and the
+          % average received power
+          export_radii(ix,iy).rec_power = sum(filtered_Ynoise);
+          export_radii(ix,iy).average_rec_power = sum(export_radii(ix,iy).average_rec_power/params.Nrep);
+                    
         end
       end % end of room traveling
 
