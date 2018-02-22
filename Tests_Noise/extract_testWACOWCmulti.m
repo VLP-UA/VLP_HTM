@@ -1,4 +1,3 @@
-experiment_name = 'WACOWCmulti4';
 % EXTRACT_TESTWACOWCMULTI Extract data from the simulations results
 %
 %   EXTRACT_TESTWACOWCMULTI(experiment_name)
@@ -6,6 +5,7 @@ experiment_name = 'WACOWCmulti4';
 %   experiment_name is the basename of a M-file containing the experiment
 %   parameters.
 %
+%experiment_name = 'WACOWCmulti4';
 
 
 %% Prepare the workspace

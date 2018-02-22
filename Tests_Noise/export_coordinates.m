@@ -1,15 +1,25 @@
+
+function [location_xy_plane] = export_coordinates( experiment_number, test_number, Ng)
+%% export_coordinates - export the data
+% experiment_number - number of the experiment to run -> 1 : 4
+% test_number - number of the test to run -> 1:65
+% Ng - number of elements per group -> 3:params.nEmitters
+%
+% %
+
+
 %% add the path to the projective geometry functions
 addpath('../../ProjGeom');
 addpath('../');
 
-clear all;
-clc;
+% clear all;
+% clc;
 
 
 %% export from raw data to xy coordinates
 
-experiment_number=  2;%1 to 4
-test_number = 50 ; % 1 to 65 -> information about the test in the params structure
+% experiment_number=  2;%1 to 4
+% test_number = 50 ; % 1 to 65 -> information about the test in the params structure
 
 load(['results/data_WACOWCmulti' num2str(experiment_number) '.mat'])
 
@@ -19,7 +29,7 @@ params = temp_data.params;
 
 % Grouping parameters
 Ng = 3; % number of emitters in the group
-use_average=1; % set to one to use the average of params.Nrep repetitions
+use_average=0; % set to one to use the average of params.Nrep repetitions
 
 %% generate emitters from params
 %%Create the light emitters
@@ -89,3 +99,5 @@ for xi=1: size(temp_data.export_radii,1)
         end
     end
 end
+end
+
