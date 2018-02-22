@@ -28,7 +28,7 @@ temp_data = data(test_number);
 params = temp_data.params;
 
 % Grouping parameters
-Ng = 3; % number of emitters in the group
+% Ng = 3; % number of emitters in the group
 use_average=0; % set to one to use the average of params.Nrep repetitions
 
 %% generate emitters from params
@@ -70,28 +70,28 @@ for xi=1: size(temp_data.export_radii,1)
         
         loc_xy=[];
         loc_ave_xy = [];
-        power_xy =[];
-        power_xy_ave=[];
+%         power_xy =[];
+%         power_xy_ave=[];
         % Calculate an estimate for each group of photodiodes
         for i =1:size(combi,1)
             radii = radii_all(combi(i,:));
             
             location = trilateration_group_em(Emitters(combi(i,:)), radii);
             loc_xy = [loc_xy location];
-            power_xy = [power_xy sum(power(combi(i,:)))];
+%             power_xy = [power_xy sum(power(combi(i,:)))];
             
             if(use_average)
                 radii_ave = radii_all_ave(combi(i,:));
                 location_average = trilateration_group_em(Emitters(combi(i,:)), radii_ave);
                 loc_ave_xy = [loc_ave_xy location_average];
-                power_xy_ave = [power_xy_ave sum(power_average(combi(i,:))) ];
+%                 power_xy_ave = [power_xy_ave sum(power_average(combi(i,:))) ];
             end
             
             
         end
         
         location_xy_plane(xi,yi).locations = loc_xy;
-        location_xy_plane(xi,yi).power = power_xy;
+        location_xy_plane(xi,yi).power = power;
         
         if(use_average)
             location_xy_plane(xi,yi).power_ave= power_xy_ave;
