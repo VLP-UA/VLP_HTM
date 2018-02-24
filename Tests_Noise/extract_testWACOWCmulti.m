@@ -78,11 +78,11 @@ clearvars -except data;
 % radii to the emitters
 
 % for the first test
-params = data(1).params;
-
-results=data(1).results;
-
-export_radii = data(1).export_radii;
-
-
+% % params = data(1).params;
+% % 
+% % results=data(1).results;
+% % 
+% % export_radii = data(1).export_radii;
+% % 
+% % 
 

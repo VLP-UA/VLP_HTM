@@ -1,5 +1,5 @@
 function testWACOWCmulti(experiment_name)
-% TESTWACOWCMULTI Simulation of VLP "naive" algorithm in a room.
+%TESTWACOWCMULTI testWACOWCmulti Simulation of VLP "naive" algorithm in a room.
 %
 %   TESTWACOWCMULTI(experiment_name)
 %
@@ -231,8 +231,8 @@ for m = m_v
           raderrorv = [];
           
           % Initialize average variables
-          export_radii(ix,iy).average_radii= 0;
-          export_radii(ix,iy).average_rec_power = 0;
+          export(ix,iy).average_radii= 0;
+          export(ix,iy).average_rec_power = 0;
           
           % Iterate
           for counter = 1:Nrep
@@ -370,8 +370,9 @@ for m = m_v
             locerrorv = [ locerrorv locerror ];
             
             % Add current repetition for later average calcualtion
-            export_radii(ix,iy).average_radii= export_radii(ix,iy).average_radii + radii;
-            export_radii(ix,iy).average_rec_power = export_radii(ix,iy).average_rec_power + filtered_Ynoise;
+            export(ix,iy).average_radii= export(ix,iy).average_radii + radii;
+            export(ix,iy).average_rec_power = export(ix,iy).average_rec_power + filtered_Ynoise;
+            
           
           end
           
@@ -384,21 +385,22 @@ for m = m_v
           % Radii export struture
           % radii is the estimated distance to each emitter
           % Add computed radii to export structure
-          export_radii(ix,iy).computed_radii = radii;
-          export_radii(ix,iy).average_radii = export_radii(ix,iy).average_radii/params.Nrep;
-          export_radii(ix,iy).true_radii = trueradii;
+          export(ix,iy).computed_radii = radii;
+          export(ix,iy).average_radii = export(ix,iy).average_radii/params.Nrep;
+          export(ix,iy).true_radii = trueradii;
+          export(ix,iy).vector = Mvec;
           
           % Reusing the strucutre to also export the recieved power and the
           % average received power
-          export_radii(ix,iy).rec_power = sum(filtered_Ynoise);
-          export_radii(ix,iy).average_rec_power = sum(export_radii(ix,iy).average_rec_power/params.Nrep);
+          export(ix,iy).rec_power = sum(filtered_Ynoise);
+          export(ix,iy).average_rec_power = sum(export(ix,iy).average_rec_power/params.Nrep);
                     
         end
       end % end of room traveling
 
       resultsfilename = createResultFilename( resultsdir, ...
         resultsBaseFn, m, Np, Nm, Psi, Nrep);
-      save(resultsfilename,'params','results', 'export_radii');
+      save(resultsfilename,'params','results', 'export');
 
       
       %% Compute and save full area aggregate results
@@ -438,3 +440,4 @@ end
 
 
 end
+

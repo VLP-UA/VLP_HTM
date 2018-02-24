@@ -1,5 +1,4 @@
-
-function [location_xy_plane] = export_coordinates( experiment_number, test_number, Ng)
+function [] = export_coordinates( experiment_number, test_number, Ng)
 %% export_coordinates - export the data
 % experiment_number - number of the experiment to run -> 1 : 4
 % test_number - number of the test to run -> 1:65
@@ -7,21 +6,12 @@ function [location_xy_plane] = export_coordinates( experiment_number, test_numbe
 %
 % %
 
-
 %% add the path to the projective geometry functions
 addpath('../../ProjGeom');
 addpath('../');
 
-% clear all;
-% clc;
-
-
 %% export from raw data to xy coordinates
-
-% experiment_number=  2;%1 to 4
-% test_number = 50 ; % 1 to 65 -> information about the test in the params structure
-
-load(['results/data_WACOWCmulti' num2str(experiment_number) '.mat'])
+load(['results/data_WACOWCmulti' num2str(experiment_number) '.mat']);
 
 temp_data = data(test_number);
 % Params Structure
@@ -45,59 +35,47 @@ for i=1:params.n_W
     end
 end
 
+warning('off','all')
 
-
+J = waitbar(0, 'Exporting coordinates...');
 %% Iterate over the xy plane and aggregate the emmiters into groups
-
-
-for xi=1: size(temp_data.export_radii,1)
-    for yi=1: size(temp_data.export_radii,2)
+for xi=1: size(temp_data.export,1)
+    for yi=1: size(temp_data.export,2)
         
         %extract variables from structure for easier handling
-        export = temp_data.export_radii(xi,yi);
+        export = temp_data.export(xi,yi);
         
         radii_all = export.computed_radii;
-        power = export.rec_power;
-        
-        if(use_average)
-            radii_all_ave = export.average_radii;
-            power_average = export.average_rec_power;
-        end
-        
+
         %generate the combination of N
         combi= nchoosek([1:params.n_Emitters],Ng);
         
-        
         loc_xy=[];
         loc_ave_xy = [];
-%         power_xy =[];
-%         power_xy_ave=[];
+        
         % Calculate an estimate for each group of photodiodes
         for i =1:size(combi,1)
             radii = radii_all(combi(i,:));
             
             location = trilateration_group_em(Emitters(combi(i,:)), radii);
             loc_xy = [loc_xy location];
-%             power_xy = [power_xy sum(power(combi(i,:)))];
-            
-            if(use_average)
-                radii_ave = radii_all_ave(combi(i,:));
-                location_average = trilateration_group_em(Emitters(combi(i,:)), radii_ave);
-                loc_ave_xy = [loc_ave_xy location_average];
-%                 power_xy_ave = [power_xy_ave sum(power_average(combi(i,:))) ];
-            end
-            
-            
         end
         
         location_xy_plane(xi,yi).locations = loc_xy;
-        location_xy_plane(xi,yi).power = power;
         
-        if(use_average)
-            location_xy_plane(xi,yi).power_ave= power_xy_ave;
-            location_xy_plane(xi,yi).location_ave = loc_ave_xy;
-        end
+        location_xy_plane(xi,yi).comb =combi(i);%% information is indexed from i =1:size(combi,1), not much needed
+        
+        % add calculated locations to the export
+        temp_data.export(xi,yi).locations= location_xy_plane(xi,yi).locations;
+        
+        % update the data stored
+        data(test_number) = temp_data;
+        
+        waitbar((xi*26+yi)/(26*26),J,['Exporting coordinates... ' num2str(xi) ' - ' num2str(yi)]);
     end
 end
+
+save(['results/data_WACOWCmulti' num2str(experiment_number) '_Ng_' num2str(Ng) '.mat'], 'data','Ng');
+
 end
 
