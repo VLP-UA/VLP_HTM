@@ -3,20 +3,20 @@ clear all;
 clc
 
 %%
-experiment_number=  1;%1 to 4
+experiment_number= 1;%1 to 4
 test_number = 61; % 1 to 65 -> information about the test in the params structure
 
 % size of the group of emitters
 Ng=3;
-%veify conditions for Ng
+%verify conditions for Ng
 if Ng > (experiment_number+1)^2 || Ng < 3
    display( [' Ng must be greater than 3 and less than ' num2str((experiment_number+1)^2)]);
    return
 end
 
 % choose position on the ground to plot
-x_index= 5;
-y_index = 5;
+x_index= 15;
+y_index = 15;
 
 experiment_name = ['WACOWCmulti' num2str(experiment_number)];
 % Folter for storing results
@@ -30,13 +30,14 @@ if exist([resultsdir 'data_' experiment_name '.mat'], 'file') == 0
     testWACOWCmulti(experiment_name);
     
     clearvars -except  experiment_number test_number Ng x_index y_index experiment_name resultsdir;
-    displa('Exporting data into structure...');
+    display('Exporting data into structure...');
     run extract_testWACOWCmulti.m
 end
 
 
 %% Export coordinates for specific experiment
 
+resultsdir = 'results/';
 
 % check if the selected test has location data already generated
 if exist([resultsdir 'data_' experiment_name '_Ng_' num2str(Ng) '.mat'], 'file')
