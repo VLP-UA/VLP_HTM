@@ -67,6 +67,10 @@ now=0;
 largest=0;
 largest_index=0;
 
+smallest_error = inf;
+smallest_error_index=0;
+
+
 for clu_index = 1:max(IDX)
     now = sum(IDX==clu_index);
     
@@ -74,11 +78,23 @@ for clu_index = 1:max(IDX)
         largest=now;
         largest_index=clu_index;
     end
-    norm(mean(coordinates(logical(IDX==clu_index),:))-d_real);
+    
+    temp_error=norm(mean(coordinates(logical(IDX==clu_index),:))-d_real);
+    if(temp_error < smallest_error)
+        smallest_error=temp_error;
+        smallest_error_index=clu_index;
+    end
 end
 
 % display the index of the largest cluster and it's error
 largest_index
-norm(mean(coordinates(logical(IDX==largest_index),:))-d_real)
+largest_cluster_error=norm(mean(coordinates(logical(IDX==largest_index),:))-d_real)
+
 %display the error of the trilateration calculation
-data(test_number).results.locerrorrms(x_index,y_index)
+trilat_error_rms=data(test_number).results.locerrorrms(x_index,y_index)
+
+
+% smallest error of the clustering
+smallest_error_index
+smallest_error
+
