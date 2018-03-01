@@ -10,8 +10,8 @@
 
 %% Prepare the workspace
 
-clearvars -except experiment_name;
-close all;
+% clearvars -except experiment_name;
+% close all;
 
 paramsfile = [experiment_name '.m'];
 

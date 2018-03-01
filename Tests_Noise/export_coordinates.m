@@ -11,7 +11,11 @@ addpath('../../ProjGeom');
 addpath('../');
 
 %% export from raw data to xy coordinates
-load(['results/data_WACOWCmulti' num2str(experiment_number) '.mat']);
+if exist(['results/data_WACOWCmulti' num2str(experiment_number) '_Ng_' num2str(Ng) '.mat'], 'file')
+    load(['results/data_WACOWCmulti' num2str(experiment_number) '_Ng_' num2str(Ng) '.mat'])
+else
+    load(['results/data_WACOWCmulti' num2str(experiment_number) '.mat']);
+end
 
 temp_data = data(test_number);
 % Params Structure
@@ -58,6 +62,7 @@ for xi=1: size(temp_data.export,1)
             radii = radii_all(combi(i,:));
             
             location = trilateration_group_em(Emitters(combi(i,:)), radii);
+            
             loc_xy = [loc_xy location];
         end
         
@@ -74,8 +79,8 @@ for xi=1: size(temp_data.export,1)
         waitbar((xi*26+yi)/(26*26),J,['Exporting coordinates... ' num2str(xi) ' - ' num2str(yi)]);
     end
 end
-
-save(['results/data_WACOWCmulti' num2str(experiment_number) '_Ng_' num2str(Ng) '.mat'], 'data','Ng');
+close(J)
+save([ 'results\data_WACOWCmulti' num2str(experiment_number) '_Ng_' num2str(Ng) '.mat'], 'data','Ng');
 
 end
 
