@@ -16,7 +16,7 @@ clear;
 close all;
 
 %% Load Data
-xperiment_number = 2;
+experiment_number = 2;
 Ng=3;
 
 path ='..\Tests_Noise\';
@@ -43,7 +43,7 @@ params = data(test_number).params;
 d_real =[params.Wstep*(x_index-1) params.Lstep*(y_index-1)];
 
 %% Run DBSCAN Clustering Algorithm
-epsilon=0.01 % min distance between points
+epsilon=0.01; % min distance between points in meters
 MinPts=3; %min size of the cluster
 
 IDX=DBSCAN(coordinates,epsilon,MinPts);
@@ -74,7 +74,7 @@ for clu_index = 1:max(IDX)
         largest=now;
         largest_index=clu_index;
     end
-    norm(mean(coordinates(logical(IDX==clu_index),:))-d_real)
+    norm(mean(coordinates(logical(IDX==clu_index),:))-d_real);
 end
 
 % display the index of the largest cluster and it's error
