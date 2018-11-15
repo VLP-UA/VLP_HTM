@@ -12,23 +12,25 @@
 %
 
 clc;
-clear;
+% clear;
 close all;
 
 %% Load Data
-experiment_number = 2;
+display('Loading...');
+experiment_number = 4;
 Ng=3;
 
 path ='..\Tests_Noise\';
 resultsdir = 'results\';
 
-load([path resultsdir 'data_WACOWCmulti' num2str(experiment_number) '_Ng_' num2str(Ng) '.mat'])
+% load([path resultsdir 'data_WACOWCmulti' num2str(experiment_number) '_Ng_' num2str(Ng) '.mat'])
 
-test_number=53;
+test_number=62;
 
-x_index =13;
-y_index=25;
+x_index =7;
+y_index=7;
 
+display('Processing...')
 %% load coordinates from the data file
 coordinates=data(test_number).export(x_index,y_index).locations;
 
@@ -36,14 +38,14 @@ coordinates=data(test_number).export(x_index,y_index).locations;
 coordinates(find(coordinates==Inf))=[];
 coordinates(isnan(coordinates)==1)=[];
 % reshape (the remove operation alters the shape of the coordinates)
-coordinates=reshape(coordinates,2,numel(coordinates)/2)';
+coordinates=reshape(coordinates,numel(coordinates)/2,2);
 
 % export params and generate real position
 params = data(test_number).params;
 d_real =[params.Wstep*(x_index-1) params.Lstep*(y_index-1)];
 
 %% Run DBSCAN Clustering Algorithm
-epsilon=0.01; % min distance between points in meters
+epsilon=0.001; % min distance between points in meters
 MinPts=3; %min size of the cluster
 
 IDX=DBSCAN(coordinates,epsilon,MinPts);
@@ -56,6 +58,9 @@ title(['DBSCAN Clustering (\epsilon = ' num2str(epsilon) ', MinPts = ' num2str(M
 hold on
 %plot real location for comparison
 plot(d_real(1), d_real(2),'*m')
+xlabel('X(m)')
+ylabel('Y(m)')
+
 
 axis([0 4 0 4])
 

@@ -4,7 +4,7 @@ close all;
 
 %% Load Data
 
-experiment_number = 4;
+experiment_number = 2;
 Ng=3;
 
 path ='..\Tests_Noise\';
@@ -40,7 +40,7 @@ for x_index = 1:26
         for index_epsilon = 1:numel(epsilon)
             for index_minPts = 1:numel(MinPts)
                 IDX=DBSCAN(coordinates,epsilon(index_epsilon),MinPts(index_minPts));
-                clusters(index_epsilon,index_minPts).IDX=IDX;
+%                 clusters(index_epsilon,index_minPts).IDX=IDX;
                 
                 % run across the generated cluster and calculate the
                 % average for each cluster
@@ -76,10 +76,10 @@ for x_index = 1:26
                 clusters(index_epsilon,index_minPts).smallest.index = smallest_error_index;
                 clusters(index_epsilon,index_minPts).smallest.error = smallest_error;
                 
-                clusters(index_epsilon,index_minPts).largest.index = largest_index;
-                clusters(index_epsilon,index_minPts).largest.nElem = largest_cluster;
-                clusters(index_epsilon,index_minPts).largest.error = largest_error;
-                
+% %                 clusters(index_epsilon,index_minPts).largest.index = largest_index;
+% %                 clusters(index_epsilon,index_minPts).largest.nElem = largest_cluster;
+% %                 clusters(index_epsilon,index_minPts).largest.error = largest_error;
+% %                 
 
             end
         end
@@ -90,7 +90,7 @@ for x_index = 1:26
 
       end
 end
-save(['cluster_new_' num2str(test_number) '.mat'], 'clustering', 'params','MinPts', 'epsilon')
+save(['cluster_new_' num2str(test_number) '_exp_' num2str(experiment_number) '.mat'], 'clustering', 'params','MinPts', 'epsilon')
 
 
 %% plot error variation with epsilon an minPts

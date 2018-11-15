@@ -1,4 +1,4 @@
-function  [cell_w, cell_l,cell,M,locations ]= partitioning( locations,actualLoc,M )
+function  [cell_w, cell_l,cell,M ]= partitioning( locations,actualLoc,M )
     x_min=min(locations(1,:));
     x_max=max(locations(1,:));
     x_st=x_min;

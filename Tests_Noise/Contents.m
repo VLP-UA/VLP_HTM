@@ -52,3 +52,5 @@
 %   shapeResults                      - UNTITLED Summary of this function goes here
 %   test_noise_full_room              - Prepare the workspace
 %   test_noise_full_room_square_lamps - Prepare the workspace
+%   trilateration_group_em            - Calculate the position by trilateration base on the
+%   export_data_to_coordinates        - Run this script to compute and export the data to the especific experiment file

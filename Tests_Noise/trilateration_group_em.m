@@ -2,6 +2,8 @@ function [ location ] = trilateration_group_em( Emitters, radii )
 %TRILATERATION_GROUP_EM Calculate the position by trilateration base on the
 % data given
 
+warning('off','all')
+
 if( numel(radii)>= 3) 
     % Get the emitters position
     temp = [Emitters.HTM];

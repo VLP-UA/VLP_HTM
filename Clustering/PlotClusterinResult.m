@@ -11,7 +11,7 @@
 % Contact Info: sm.kalami@gmail.com, info@yarpiz.com
 %
 
-function PlotClusterinResult(X, IDX)
+function [Legends] = PlotClusterinResult(X, IDX)
 
     k=max(IDX);
 

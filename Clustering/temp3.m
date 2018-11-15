@@ -1,54 +1,40 @@
-clear
-clc
-close all
-addpath('..\Clustering\')
+clc;
+clear;
+close all;
 
-load('..\Tests_Noise\results\data_WACOWCmulti4_Ng_3.mat')
-%%
-% tested i point(20,20)
-test_number=62;
-x_index=26;
-y_index=13;
+%% Load Data
 
-for x_index =1:26
-    for y_index = 1:26
-        display([num2str(x_index) '...' num2str(y_index)])
-        actualLoc=[(x_index-1)*4/26,(y_index-1)*4/26];
-        % the estimated locations
-        locations=data(test_number).export(x_index,y_index).locations;
-        % number of cells in each direction (grid dimension)
-        M=20;  %(2:any integer)
-        %% functions
-           % remove NaNs and Inf
-        [locations_new]= clean( locations );
-            % grid formation where the actual location is only for illustration in
-            % the figure
-        [cell_w, cell_l,cell,M,locations ]= partitioning( locations_new,actualLoc,M );
-        % axis([0 4 0 4])
-             % cell specifications and cluster initialization
-        [ cell,locations_new,T,m,cell_out] = CellDensity( cell, locations_new,M, cell_w,cell_l );
+experiment_number = 4;
+Ng=3;
 
+path ='..\Tests_Noise\';
+resultsdir = 'results\';
 
-        %% DBSCAN part
-        % extract data from cell_out
-        coordinates=[];
-        for index=1:numel(cell_out)
-            coordinates=[coordinates; cell_out(index).loc];
-        end
-        %%not needed here
+load([path resultsdir 'data_WACOWCmulti' num2str(experiment_number) '_Ng_' num2str(Ng) '.mat'])
+
+test_number=53;
+
+x_index =16;
+y_index=14;
+
+for x_index = 14:26
+    for y_index = 1:13
+        %% load coordinates from the data file
+        display([ num2str(x_index) '...' num2str(y_index)])
+        coordinates=data(test_number).export(x_index,y_index).locations;
+
         % remove inf and nan form coordinates
-        % coordinates(find(coordinates==Inf))=[];
-        % coordinates(isnan(coordinates)==1)=[];
-        % % reshape (the remove operation alters the shape of the coordinates)
-        % coordinates=reshape(coordinates,2,numel(coordinates)/2)';
+        coordinates(find(coordinates==Inf))=[];
+        coordinates(isnan(coordinates)==1)=[];
+        % reshape (the remove operation alters the shape .0of the coordinates)
+        coordinates=reshape(coordinates,numel(coordinates)/2,2);
 
-        % % % export params and generate real position
-                params = data(test_number).params;
-                d_real =[params.Wstep*(x_index-1) params.Lstep*(y_index-1)];
+        % export params and generate real position
+        params = data(test_number).params;
+        d_real =[params.Wstep*(x_index-1) params.Lstep*(y_index-1)];
 
         %% Run DBSCAN Clustering Algorithm
-        %% Run DBSCAN Clustering Algorithm
-                epsilon=linspace(0.001, 0.15,15);%0.1; % min distance between points in meters
+        epsilon=linspace(0.001, 0.2,20);%0.1; % min distance between points in meters
         MinPts=[3:10];%5 %min size of the cluster
         
         for index_epsilon = 1:numel(epsilon)
@@ -101,10 +87,20 @@ for x_index =1:26
         %% display the error of the trilateration calculation
         trilat_error_rms=data(test_number).results.locerrorrms(x_index,y_index);
         clustering(x_index,y_index).rmsError= trilat_error_rms;
-    end
-end
 
-save(['data_out_' num2str(test_number) '_outlier_dbscan.mat'], 'clustering', 'params')
+      end
+end
+save('cluster_new_53_3.mat')
+
+
+%% plot error variation with epsilon an minPts
+ 
+
+
+
+
+
+
 
 
 
