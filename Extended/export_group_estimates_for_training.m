@@ -278,7 +278,7 @@ end
 %%
 
 
-
+save('coordinate_data', 'ground', 'params', 'Emitters')
 
 
 
