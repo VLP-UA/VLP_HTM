@@ -9,7 +9,7 @@ load coordinate_data.mat
 
 plotOn=0;
 
-n_max_clusters = 15;
+n_max_clusters = 3;
 
 
 cluster_array = 1: n_max_clusters;
@@ -19,12 +19,10 @@ x_index_array = 1:size(ground,1);
 y_index_array = 1:size(ground,2);
 
 
-epsilon = linspace(0.001,0.3,25);%0.001:0.001:0.75;%linspace(0.001,1,50);%[ 0.2 0.1 0.05 0.025 0.01 0.005 0.0025]; % min distance between points in meters
-MinPts =3;%[3:50];%[20 15 12 10 7 5 3 2]; %min size of the cluster
-
 %% load coordinates from the data file
 for x_index = x_index_array
     for y_index = y_index_array
+        
         display(['X: '  num2str(x_index) ' Y:' num2str(y_index)]);
         coordinates=ground(x_index,y_index).coordinates;
         
@@ -34,6 +32,7 @@ for x_index = x_index_array
         %% Run DBSCAN Clustering Algorithm
         
         for n_clusters = cluster_array
+            
             opts = statset('Display','off');
             [cidx, ctrs] = kmeans(coordinates, n_clusters, 'Distance','city', ...
                 'Replicates',5, 'Options',opts);
@@ -49,6 +48,7 @@ for x_index = x_index_array
                 plot(real_pos(1), real_pos(2),'k*')
                 plot(estimated_pos(1), estimated_pos(2),'m*')
             end
+            
             real_error(n_clusters) = inf;
             for i = 1:n_clusters
                 if plotOn
@@ -57,7 +57,7 @@ for x_index = x_index_array
                 end
                 
                 % find min error of all clusters
-                temp_error = norm(ctrs(i)-real_pos);
+                temp_error = norm(ctrs(i,:)-real_pos);
                 if(temp_error <= real_error(n_clusters))
                     real_error(n_clusters)=temp_error;
                 end  
@@ -67,12 +67,13 @@ for x_index = x_index_array
         KMEANS_data(x_index, y_index).real_error = real_error;
         KMEANS_data(x_index, y_index).n_clusters = ...
             cluster_array(min(find(real_error == min(real_error))));
+        KMEANS_data(x_index, y_index).min_error = min(real_error);
 
     end
 end
-min(min(reshape([KMEANS_data(:).real_error],41,41)))
-mean(mean(reshape([KMEANS_data(:).real_error],41,41)))
-max(max(reshape([KMEANS_data(:).real_error],41,41)))
+min(min(reshape([KMEANS_data(:).min_error],41,41)))
+mean(mean(reshape([KMEANS_data(:).min_error],41,41)))
+max(max(reshape([KMEANS_data(:).min_error],41,41)))
 
 %%
 
@@ -80,10 +81,10 @@ figure
 surf(1:41,1:41,reshape([KMEANS_data(:).n_clusters],41,41))
 
 figure
-surf(1:41,1:41,reshape([KMEANS_data(:).real_error],41,41))
+surf(1:41,1:41,reshape([KMEANS_data(:).min_error],41,41))
 
 
-save('dbscan_data', 'DBSCAN_data')
+save('kmeans_data', 'KMEANS_data')
 
 
 
