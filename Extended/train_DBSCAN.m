@@ -3,6 +3,8 @@ clear;
 close all;
 
 %% Load Data
+
+addpath('../Clustering/');
 load coordinate_data.mat
 
 plotOn=0;
@@ -13,7 +15,7 @@ x_index_array = 1:size(ground,1);
 y_index_array = 1:size(ground,2);
 
 
-epsilon =0.001:0.001:0.5;%linspace(0.001,1,50);%[ 0.2 0.1 0.05 0.025 0.01 0.005 0.0025]; % min distance between points in meters
+epsilon =0.001:0.001:0.75;%linspace(0.001,1,50);%[ 0.2 0.1 0.05 0.025 0.01 0.005 0.0025]; % min distance between points in meters
 MinPts =3;%[3:50];%[20 15 12 10 7 5 3 2]; %min size of the cluster
 
 %% load coordinates from the data file
@@ -46,13 +48,17 @@ for x_index = x_index_array
                     plot(estimated_pos(1), estimated_pos(2),'*g')
                 end
                 
-                if sum(IDX) >=3
+                if sum(IDX) >= 3
+                    real_error(epsilon_index)=inf;
                     for i=1:max(IDX)
                         cluster_centers=mean(coordinates(IDX==i,:),1);
                         if plotOn
                             plot(cluster_centers(1), cluster_centers(2),'*k')
                         end
-                        real_error(epsilon_index)=norm(cluster_centers-real_pos);
+                        temp_error = norm(cluster_centers-real_pos);
+                        if temp_error < real_error(epsilon_index)
+                            real_error(epsilon_index)= temp_error;
+                        end
                     end
                 else
                     %display('ERROR')
@@ -72,10 +78,17 @@ min(min(reshape([DBSCAN_data(:).best_epsilon_error],41,41)))
 mean(mean(reshape([DBSCAN_data(:).best_epsilon_error],41,41)))
 max(max(reshape([DBSCAN_data(:).best_epsilon_error],41,41)))
 
-figure
-surf(1:41,1:41,reshape([DBSCAN_data(:).best_epsilon_error],41,41))
+%% 
+
 figure
 surf(1:41,1:41,reshape([DBSCAN_data(:).best_epsilon],41,41))
+
+figure
+surf(1:41,1:41,reshape([DBSCAN_data(:).best_epsilon_error],41,41))
+
+
+save('dbscan_data', 'DBSCAN_data')
+
 
 
 %%
