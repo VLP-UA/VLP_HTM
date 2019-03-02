@@ -9,7 +9,7 @@ load coordinate_data.mat
 
 plotOn=0;
 
-n_max_clusters = 3;
+n_max_clusters = 5;
 
 
 cluster_array = 1: n_max_clusters;
