@@ -15,7 +15,7 @@ x_index_array = 1:size(ground,1);
 y_index_array = 1:size(ground,2);
 
 
-bandwidth = linspace(0.001,0.3,25);%0.001:0.001:0.75;%linspace(0.001,1,50);%[ 0.2 0.1 0.05 0.025 0.01 0.005 0.0025]; % min distance between points in meters
+bandwidth = linspace(0.001,0.60,100);%0.001:0.001:0.75;%linspace(0.001,1,50);%[ 0.2 0.1 0.05 0.025 0.01 0.005 0.0025]; % min distance between points in meters
 
 %% load coordinates from the data file
 for x_index = x_index_array
@@ -30,7 +30,7 @@ for x_index = x_index_array
         
         %% Run MEAN SHIFT
         plotFlag=false;
-        for bandwidth_index = 1:size(bandwidth)
+        for bandwidth_index = 1:size(bandwidth,2)
             [clustCent,data2cluster,cluster2dataCell] = ...
                 MeanShiftCluster(coordinates',bandwidth(bandwidth_index),plotFlag);
             
@@ -47,12 +47,20 @@ for x_index = x_index_array
                 legend TOGGLE
             end
             
-            for i=1:size(clustCent,2)
-                temp_error = norm(clustCent(:,i)'-real_pos);
-                if(temp_error <= real_error(bandwidth_index))
-                    real_error(bandwidth_index)=temp_error;
+            real_error(bandwidth_index) = inf;
+            
+%             if size(clustCent,2) < 8
+                for i=1:size(clustCent,2)
+                    if( sum(data2cluster(data2cluster==i))/i >=3)
+                        temp_error = norm(clustCent(:,i)'-real_pos);
+                        
+                        if(temp_error <= real_error(bandwidth_index))
+                            real_error(bandwidth_index)=temp_error;
+                        end
+                    end
+                    
                 end
-            end
+%             end
             
             
         end
@@ -65,17 +73,19 @@ for x_index = x_index_array
         
     end
 end
-min(min(reshape([MEANSHIFT_data(:).real_error],41,41)))
-mean(mean(reshape([MEANSHIFT_data(:).real_error],41,41)))
-max(max(reshape([MEANSHIFT_data(:).real_error],41,41)))
+
+%% 
+min(min(reshape([MEANSHIFT_data(:).bandwidth_error],41,41)))
+mean(mean(reshape([MEANSHIFT_data(:).bandwidth_error],41,41)))
+max(max(reshape([MEANSHIFT_data(:).bandwidth_error],41,41)))
 
 %%
 
 figure
-surf(1:41,1:41,reshape([MEANSHIFT_data(:).n_clusters],41,41))
+surf(1:41,1:41,reshape([MEANSHIFT_data(:).bandwidth],41,41))
 
 figure
-surf(1:41,1:41,reshape([MEANSHIFT_data(:).real_error],41,41))
+surf(1:41,1:41,reshape([MEANSHIFT_data(:).bandwidth_error],41,41))
 
 
 save('meanshift_data', 'MEANSHIFT_data')
