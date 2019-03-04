@@ -377,6 +377,10 @@ mean_dbscan_error = mean(mean(reshape([ground(:,:).dbscan_error],nPoints,nPoints
 mean_kmeans_error = mean(mean(reshape([ground(:,:).kmeans_error],nPoints,nPoints)));
 mean_meanshift_error = mean(mean(reshape([ground(:,:).meanshift_error],nPoints,nPoints)));
 
+mean_dbscan_error_real = mean(mean(reshape([ground(:,:).dbscan_error_real],nPoints,nPoints)));
+mean_kmeans_error_real = mean(mean(reshape([ground(:,:).kmeans_error_real],nPoints,nPoints)));
+mean_meanshift_error_real = mean(mean(reshape([ground(:,:).meanshift_error_real],nPoints,nPoints)));
+
 save(ground)
 
 figure
@@ -392,8 +396,8 @@ shading interp
 axis square
 
 subplot(1,4,2)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),reshape([ground(:,:).dbscan_error],nPoints,nPoints))
-title(['DBSCAN error : ' num2str(mean_dbscan_error)])
+surf(linspace(0,4,nPoints),linspace(0,4,nPoints),reshape([ground(:,:).dbscan_error_real],nPoints,nPoints))
+title(['DBSCAN error : ' num2str(mean_dbscan_error_real)])
 xlabel('X(m)')
 ylabel('Y(m)')
 % colormap('jet')
@@ -403,8 +407,8 @@ shading interp
 axis square
 
 subplot(1,4,3)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),reshape([ground(:,:).kmeans_error],nPoints,nPoints))
-title(['KMEANS error : ' num2str(mean_kmeans_error)])
+surf(linspace(0,4,nPoints),linspace(0,4,nPoints),reshape([ground(:,:).kmeans_error_real],nPoints,nPoints))
+title(['KMEANS error : ' num2str(mean_kmeans_error_real)])
 xlabel('X(m)')
 ylabel('Y(m)')
 % colormap('jet')
@@ -415,7 +419,7 @@ axis square
 
 subplot(1,4,4)
 surf(linspace(0,4,nPoints),linspace(0,4,nPoints),reshape([ground(:,:).meanshift_error],nPoints,nPoints))
-title(['MEANSHIFT error : ' num2str(mean_meanshift_error)])
+title(['MEANSHIFT error : ' num2str(mean_meanshift_error_real)])
 xlabel('X(m)')
 ylabel('Y(m)')
 % colormap('jet')
