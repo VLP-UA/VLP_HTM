@@ -381,52 +381,79 @@ mean_dbscan_error_real = mean(mean(reshape([ground(:,:).dbscan_error_real],nPoin
 mean_kmeans_error_real = mean(mean(reshape([ground(:,:).kmeans_error_real],nPoints,nPoints)));
 mean_meanshift_error_real = mean(mean(reshape([ground(:,:).meanshift_error_real],nPoints,nPoints)));
 
-save(ground)
+% save(ground)
+threshold_level=0.05
 
-figure
+trilat_points=reshape([ground(:,:).trilat_error],nPoints,nPoints);
+trilat_points(find(trilat_points > threshold_level))=1;
+count_trilat=sum(trilat_points(find(trilat_points > threshold_level)));
+trilat_points(find(trilat_points > threshold_level))=inf;
+
 subplot(1,4,1)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),reshape([ground(:,:).trilat_error],nPoints,nPoints))
-title(['Trilateration error : ' num2str(mean_trilat_error)])
+surf(linspace(0,4,nPoints),linspace(0,4,nPoints),trilat_points)
+title(['Trilateration error : ' num2str((1681-count_trilat)/(1681))])
 xlabel('X(m)')
 ylabel('Y(m)')
 % colormap('jet')
 colorbar
-caxis([0 0.2])
+caxis([0 threshold_level])
 shading interp
 axis square
+view(0,90)
+
+dbscan_points=reshape([ground(:,:).dbscan_error_real],nPoints,nPoints);
+dbscan_points(find(dbscan_points > threshold_level))=1;
+count_dbscan=sum(dbscan_points(find(dbscan_points > threshold_level)));
+dbscan_points(find(dbscan_points > threshold_level))=inf;
 
 subplot(1,4,2)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),reshape([ground(:,:).dbscan_error_real],nPoints,nPoints))
-title(['DBSCAN error : ' num2str(mean_dbscan_error_real)])
+surf(linspace(0,4,nPoints),linspace(0,4,nPoints),dbscan_points)
+title(['DBSCAN error : ' num2str((1681-count_dbscan)/(1681))])
 xlabel('X(m)')
 ylabel('Y(m)')
 % colormap('jet')
 colorbar
-caxis([0 0.2])
+caxis([0 threshold_level])
 shading interp
 axis square
+view(0,90)
+
+
+kmeans_points=reshape([ground(:,:).kmeans_error_real],nPoints,nPoints);
+kmeans_points(find(kmeans_points > threshold_level))=1;
+count_kmeans=sum(kmeans_points(find(kmeans_points > threshold_level)));
+kmeans_points(find(kmeans_points > threshold_level))=inf;
 
 subplot(1,4,3)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),reshape([ground(:,:).kmeans_error_real],nPoints,nPoints))
-title(['KMEANS error : ' num2str(mean_kmeans_error_real)])
+surf(linspace(0,4,nPoints),linspace(0,4,nPoints),kmeans_points)
+title(['KMEANS error : ' num2str((1681-count_kmeans)/1681)])
 xlabel('X(m)')
 ylabel('Y(m)')
 % colormap('jet')
 colorbar
-caxis([0 0.2])
+caxis([0 threshold_level])
 shading interp
 axis square
+view(0,90)
+
+meanshift_points=reshape([ground(:,:).meanshift_error],nPoints,nPoints);
+meanshift_points(find(meanshift_points > threshold_level))= 1;
+count_meanshift=sum(meanshift_points(find(meanshift_points > threshold_level)));
+meanshift_points(find(meanshift_points > threshold_level))=inf;
+
+
 
 subplot(1,4,4)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),reshape([ground(:,:).meanshift_error],nPoints,nPoints))
-title(['MEANSHIFT error : ' num2str(mean_meanshift_error_real)])
+surf(linspace(0,4,nPoints),linspace(0,4,nPoints),meanshift_points)
+title(['MEANSHIFT error : ' num2str((1681-count_meanshift)/1681)])
 xlabel('X(m)')
 ylabel('Y(m)')
 % colormap('jet')
 colorbar
-caxis([0 0.2])
+caxis([0 threshold_level])
 shading interp
 axis square
+view(0,90)
 
 
 
