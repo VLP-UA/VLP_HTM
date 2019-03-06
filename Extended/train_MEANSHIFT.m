@@ -83,10 +83,20 @@ max(max(reshape([MEANSHIFT_data(:).bandwidth_error],41,41)))
 
 figure
 surf(1:41,1:41,reshape([MEANSHIFT_data(:).bandwidth],41,41))
+title(' Bandwidth matrtix');
+axis([1 41 1 41]);
+colorbar;
 
 figure
 surf(1:41,1:41,reshape([MEANSHIFT_data(:).bandwidth_error],41,41))
+average=mean(mean(reshape([MEANSHIFT_data(:).bandwidth_error],41,41)));
+title(['Result error: ' num2str(average)]);
+caxis([0 0.2]);
+colorbar
+axis([1 41 1 41]);
 
+
+%%
 
 save('meanshift_data', 'MEANSHIFT_data')
 
