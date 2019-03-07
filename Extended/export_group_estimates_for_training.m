@@ -149,7 +149,7 @@ for xloc = linspace(0,4,nPoints)%0:0.05:params.W
             % GEnerate noise signal
             s = sqrt(Nu).*randn(size(Y));
             %Add noise do input signal
-            Ynoise = Y ;%+ s;
+            Ynoise = Y + s;
             
             % If variable nonoise exists and if it is set, shut down noise
             if exist('nonoise')
