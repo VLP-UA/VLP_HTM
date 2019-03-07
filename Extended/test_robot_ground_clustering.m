@@ -2,7 +2,7 @@
 clear
 close
 clc
-%% 
+%%
 % % nonoise =1
 load('..\Clustering\epsilon_minPts_matrix_62_exp_4.mat')
 
@@ -20,6 +20,8 @@ addpath('../Tests_Noise\')
 addpath('../Clustering\')
 
 plotOn = 0;
+group_overlap = 1;
+
 
 xloc =rand()*(params.W)
 yloc =  rand()*params.L
@@ -49,13 +51,34 @@ end
 
 %% create emitter groups
 count=1;
-for i=1:params.n_W-1
-    for j = 1:params.n_L-1
-        emitter_groups(count,:) = [ j+(i-1)*params.n_L j+(i-1)*params.n_L+1 j+(i-1)*params.n_L+5 ...
-            j+(i-1)*params.n_L+6]';
-        count=count+1;
+
+if group_overlap
+    for y=1:params.n_W-1
+        for x = 1:params.n_L-1
+            for j = 1:params.n_W-y
+                for i = 1:params.n_L-x
+                    emitter_groups(count,:) = [ ...
+                        x+(y-1)*params.n_L ...
+                        x+i+(y-1)*params.n_L ...
+                        x+(y+j-1)*params.n_L ...
+                        x+i+(y+j-1)*params.n_L]';
+                    count=count+1;
+                end
+            end
+            
+        end
+    end   
+else
+    for i=1:params.n_W-1
+        for j = 1:params.n_L-1
+            emitter_groups(count,:) = [ j+(i-1)*params.n_L j+(i-1)*params.n_L+1 j+(i-1)*params.n_L+5 ...
+                j+(i-1)*params.n_L+6]';
+            count=count+1;
+        end
     end
 end
+
+
 
 %% Create the receivers
 
@@ -246,7 +269,7 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         %interpolate data for epsilon and minPts
         
         
-        epsilon = DBSCAN_data(round(xloc/step)+1,round(yloc/step)+1).best_epsilon;        
+        epsilon = DBSCAN_data(round(xloc/step)+1,round(yloc/step)+1).best_epsilon;
         IDX=DBSCAN(coordinates,epsilon,3);
         
         
@@ -262,12 +285,12 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
             plot(xloc, yloc,'og');
             axis([0 4 0 4])
         end
-         
+        
         
         smallest_error_DBSCAN = inf;
         for index=1:max(IDX)
             %calculate the center position of each cluster
-            temp=mean(coordinates(IDX==index,:),1); 
+            temp=mean(coordinates(IDX==index,:),1);
             estimated_error_DBSCAN = norm(temp -estimatedLocation);
             
             % find cluster with smallest error
@@ -275,18 +298,18 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
                 smallest_error_DBSCAN = estimated_error_DBSCAN;
                 smallest_error_DBSCAN_index = index;
             end
-
-
+            
+            
             if plotOn
                 plot(temp(1), temp(2),'*k');
                 hold on
             end
-
+            
         end
         
-        temp=mean(coordinates(IDX==smallest_error_DBSCAN_index,:),1); 
+        temp=mean(coordinates(IDX==smallest_error_DBSCAN_index,:),1);
         real_error_DBSCAN = norm(temp - [xloc yloc]);
-            
+        
         
         %% Run K MEANS
         
@@ -295,22 +318,22 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         opts = statset('Display','off');
         [cidx, ctrs] = kmeans(coordinates, n_clusters, 'Distance','city', ...
             'Replicates',5, 'Options',opts);
-                
+        
         estimated_error_kmeans = inf;
         for i = 1:n_clusters
             if plotOn
                 plot(coordinates(cidx==i,1),coordinates(cidx==i,2),'o');
                 hold on;
             end
-
+            
             % find min error of all clusters
             temp_error = norm(ctrs(i,:)-estimatedLocation);
             if(temp_error <= estimated_error_kmeans)
                 estimated_error_kmeans=temp_error;
                 estimated_error_kmeans_cluster = i;
-            end  
-
-        end 
+            end
+            
+        end
         
         real_error_KMEANS = norm(ctrs(estimated_error_kmeans_cluster,:) - [xloc yloc]);
         
@@ -336,8 +359,8 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
             
             legend TOGGLE
         end
-            
-       
+        
+        
         estimated_error_meanshift = inf;
         
         
@@ -357,14 +380,14 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         %%
         
         ground(round(xloc/step)+1,round(yloc/step)+1).trilat_error = trilat_error;
-        ground(round(xloc/step)+1,round(yloc/step)+1).dbscan_error = smallest_error_DBSCAN;        
-        ground(round(xloc/step)+1,round(yloc/step)+1).kmeans_error = estimated_error_kmeans;        
-        ground(round(xloc/step)+1,round(yloc/step)+1).meanshift_error = estimated_error_meanshift; 
+        ground(round(xloc/step)+1,round(yloc/step)+1).dbscan_error = smallest_error_DBSCAN;
+        ground(round(xloc/step)+1,round(yloc/step)+1).kmeans_error = estimated_error_kmeans;
+        ground(round(xloc/step)+1,round(yloc/step)+1).meanshift_error = estimated_error_meanshift;
         
         
-        ground(round(xloc/step)+1,round(yloc/step)+1).dbscan_error_real = real_error_DBSCAN;        
-        ground(round(xloc/step)+1,round(yloc/step)+1).kmeans_error_real = real_error_KMEANS;        
-        ground(round(xloc/step)+1,round(yloc/step)+1).meanshift_error_real = real_error_MEANSHIFT; 
+        ground(round(xloc/step)+1,round(yloc/step)+1).dbscan_error_real = real_error_DBSCAN;
+        ground(round(xloc/step)+1,round(yloc/step)+1).kmeans_error_real = real_error_KMEANS;
+        ground(round(xloc/step)+1,round(yloc/step)+1).meanshift_error_real = real_error_MEANSHIFT;
         
         
     end

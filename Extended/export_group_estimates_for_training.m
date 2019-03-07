@@ -14,6 +14,7 @@ addpath('../Tests_Noise\')
 addpath('../Clustering\')
 
 plotOn = 0;
+group_overlap=1;
 
 xloc =rand()*(params.W)
 yloc =  rand()*params.L
@@ -43,34 +44,32 @@ end
 
 %% create emitter groups
 count=1;
-for i=1:params.n_W-1
-    for j = 1:params.n_L-1
-        emitter_groups(count,:) = [ j+(i-1)*params.n_L j+(i-1)*params.n_L+1 j+(i-1)*params.n_L+5 ...
-            j+(i-1)*params.n_L+6]';
-        count=count+1;
+
+if group_overlap
+    for y=1:params.n_W-1
+        for x = 1:params.n_L-1
+            for j = 1:params.n_W-y
+                for i = 1:params.n_L-x
+                    emitter_groups(count,:) = [ ...
+                        x+(y-1)*params.n_L ...
+                        x+i+(y-1)*params.n_L ...
+                        x+(y+j-1)*params.n_L ...
+                        x+i+(y+j-1)*params.n_L]';
+                    count=count+1;
+                end
+            end
+            
+        end
+    end   
+else
+    for i=1:params.n_W-1
+        for j = 1:params.n_L-1
+            emitter_groups(count,:) = [ j+(i-1)*params.n_L j+(i-1)*params.n_L+1 j+(i-1)*params.n_L+5 ...
+                j+(i-1)*params.n_L+6]';
+            count=count+1;
+        end
     end
 end
-
-%%emitter_groups = emitter_groups';
-
-
-
-
-
-% % % % % if usegraphics
-% % % % %
-% % % % %     % Plot the emitters position
-% % % % %     if(isgraphics(1))
-% % % % %         clf(1)
-% % % % %     else
-% % % % %         figure(1)
-% % % % %     end
-% % % % %
-% % % % %     PlotHTMArray(Emitters);
-% % % % %     axis([-0.5 W+0.5 -0.5 L+0.5 0 H+0.5]);
-% % % % %     view(3);
-% % % % %     grid on
-% % % % % end
 
 %% Create the receivers
 
