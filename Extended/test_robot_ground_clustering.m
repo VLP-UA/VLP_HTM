@@ -244,6 +244,18 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         
         Ng=3;
         
+        % calculated de average value of the sum of recieved power for each
+        % emitter group
+        for index=1: size(emitter_groups,1)
+            average_power_sum(index) =mean(sum(Ynoise(:,emitter_groups(index,:))))
+        end       
+        
+        %select the emitter groups with power above average
+        selected_emitters=find(average_power_sum >= mean(average_power_sum));
+        
+        %new emitter groups
+        emitter_groups=emitter_groups(selected_emitters,:);
+        
         % create combinations of selected emmiters and radius
         %generate the combination of N
         %combi= nchoosek([1:numel(emitters_export)],Ng);
