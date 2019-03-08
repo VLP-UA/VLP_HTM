@@ -67,7 +67,7 @@ if group_overlap
             end
             
         end
-    end   
+    end
 else
     for i=1:params.n_W-1
         for j = 1:params.n_L-1
@@ -247,14 +247,14 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         % calculated de average value of the sum of recieved power for each
         % emitter group
         for index=1: size(emitter_groups,1)
-            average_power_sum(index) =mean(sum(Ynoise(:,emitter_groups(index,:))))
-        end       
+            average_power_sum(index) =mean(sum(Ynoise(:,emitter_groups(index,:))));
+        end
         
         %select the emitter groups with power above average
         selected_emitters=find(average_power_sum >= mean(average_power_sum));
         
         %new emitter groups
-        emitter_groups=emitter_groups(selected_emitters,:);
+        new_emitter_groups=emitter_groups(selected_emitters,:);
         
         % create combinations of selected emmiters and radius
         %generate the combination of N
@@ -264,10 +264,10 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         loc_combinations=[];
         
         % Calculate an estimate for each group of photodiodes
-        for i =1:size(emitter_groups)
-            radii_group = radii(emitter_groups(i,:));
+        for i =1:size(new_emitter_groups)
+            radii_group = radii(new_emitter_groups(i,:));
             
-            location = trilateration_group_em(Emitters(emitter_groups(i,:)), radii_group);%% emitters_export(combi(i,:)), radii);
+            location = trilateration_group_em(Emitters(new_emitter_groups(i,:)), radii_group);%% emitters_export(combi(i,:)), radii);
             
             loc_combinations = [loc_combinations location];
         end
@@ -377,17 +377,18 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         
         
         for i=1:size(clustCent,2)
-            if( sum(data2cluster(data2cluster==i))/i >=3)
+            if( sum(data2cluster(data2cluster==i))/i >=2)
                 temp_error = norm(clustCent(:,i)'- estimatedLocation);
                 
                 if(temp_error <= estimated_error_meanshift)
                     estimated_error_meanshift = temp_error;
                     estimated_error_meanshift_cluster=i;
-                    real_error_MEANSHIFT = norm(clustCent(:,estimated_error_meanshift_cluster)' - [xloc yloc]);
                 end
             end
             
         end
+        real_error_MEANSHIFT = norm(clustCent(:,estimated_error_meanshift_cluster)' - [xloc yloc]);
+        
         
         %%
         
