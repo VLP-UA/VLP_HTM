@@ -82,11 +82,22 @@ max(max(reshape([DBSCAN_data(:).best_epsilon_error],41,41)))
 
 figure
 surf(1:41,1:41,reshape([DBSCAN_data(:).best_epsilon],41,41))
+title('Epsilon matrix');
+colorbar
+axis([1 41 1 41]);
 
 figure
 surf(1:41,1:41,reshape([DBSCAN_data(:).best_epsilon_error],41,41))
+average=mean(mean(reshape([DBSCAN_data(:).best_epsilon_error],41,41)));
+title(['Result error: ' num2str(average)]);
+caxis([0 0.2])
+colorbar
+
+axis([1 41 1 41]);
 
 
+
+%%
 save('dbscan_data', 'DBSCAN_data')
 
 
