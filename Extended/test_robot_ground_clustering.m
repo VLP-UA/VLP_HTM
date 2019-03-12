@@ -300,6 +300,7 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         
         
         smallest_error_DBSCAN = inf;
+        smallest_error_DBSCAN_index=0;
         for index=1:max(IDX)
             %calculate the center position of each cluster
             temp=mean(coordinates(IDX==index,:),1);
@@ -421,12 +422,13 @@ mean_meanshift_error_real = mean(mean(reshape([ground(:,:).meanshift_error_real]
 threshold_level=0.05
 
 trilat_points=reshape([ground(:,:).trilat_error],nPoints,nPoints);
+trilat_plot= trilat_points;
 trilat_points(find(trilat_points > threshold_level))=1;
 count_trilat=sum(trilat_points(find(trilat_points > threshold_level)));
 trilat_points(find(trilat_points > threshold_level))=inf;
 
 subplot(1,4,1)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),trilat_points)
+surf(linspace(0,4,nPoints),linspace(0,4,nPoints),trilat_plot)
 title(['Trilateration error : ' num2str((1681-count_trilat)/(1681))])
 xlabel('X(m)')
 ylabel('Y(m)')
@@ -438,12 +440,13 @@ axis square
 view(0,90)
 
 dbscan_points=reshape([ground(:,:).dbscan_error_real],nPoints,nPoints);
+dbscan_plot= dbscan_points;
 dbscan_points(find(dbscan_points > threshold_level))=1;
 count_dbscan=sum(dbscan_points(find(dbscan_points > threshold_level)));
 dbscan_points(find(dbscan_points > threshold_level))=inf;
 
 subplot(1,4,2)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),dbscan_points)
+surf(linspace(0,4,nPoints),linspace(0,4,nPoints),dbscan_plot)
 title(['DBSCAN error : ' num2str((1681-count_dbscan)/(1681))])
 xlabel('X(m)')
 ylabel('Y(m)')
@@ -456,12 +459,13 @@ view(0,90)
 
 
 kmeans_points=reshape([ground(:,:).kmeans_error_real],nPoints,nPoints);
+kmeans_plot=kmeans_points;
 kmeans_points(find(kmeans_points > threshold_level))=1;
 count_kmeans=sum(kmeans_points(find(kmeans_points > threshold_level)));
 kmeans_points(find(kmeans_points > threshold_level))=inf;
 
 subplot(1,4,3)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),kmeans_points)
+surf(linspace(0,4,nPoints),linspace(0,4,nPoints),kmeans_plot)
 title(['KMEANS error : ' num2str((1681-count_kmeans)/1681)])
 xlabel('X(m)')
 ylabel('Y(m)')
@@ -472,7 +476,8 @@ shading interp
 axis square
 view(0,90)
 
-meanshift_points=reshape([ground(:,:).meanshift_error],nPoints,nPoints);
+meanshift_points=reshape([ground(:,:).meanshift_error_real],nPoints,nPoints);
+meanshift_plot=meanshift_points;
 meanshift_points(find(meanshift_points > threshold_level))= 1;
 count_meanshift=sum(meanshift_points(find(meanshift_points > threshold_level)));
 meanshift_points(find(meanshift_points > threshold_level))=inf;
@@ -480,7 +485,7 @@ meanshift_points(find(meanshift_points > threshold_level))=inf;
 
 
 subplot(1,4,4)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),meanshift_points)
+surf(linspace(0,4,nPoints),linspace(0,4,nPoints),meanshift_plot)
 title(['MEANSHIFT error : ' num2str((1681-count_meanshift)/1681)])
 xlabel('X(m)')
 ylabel('Y(m)')
@@ -490,6 +495,8 @@ caxis([0 threshold_level])
 shading interp
 axis square
 view(0,90)
+
+save('ground', 'ground');
 
 
 
