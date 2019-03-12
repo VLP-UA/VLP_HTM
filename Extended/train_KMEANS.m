@@ -25,7 +25,8 @@ for x_index = x_index_array
         
         display(['X: '  num2str(x_index) ' Y:' num2str(y_index)]);
         coordinates=ground(x_index,y_index).coordinates;
-        
+        selected_averages=ground(x_index,y_index).coordinates_averages;
+
         real_pos = ground(x_index,y_index).xy;
         estimated_pos = ground(x_index,y_index).estimated_location;
         
@@ -50,6 +51,7 @@ for x_index = x_index_array
             end
             
             real_error(n_clusters) = inf;
+            power_cluster= [];
             for i = 1:n_clusters
                 if plotOn
                     plot(coordinates(cidx==i,1),coordinates(cidx==i,2),'o');
@@ -57,12 +59,18 @@ for x_index = x_index_array
                 end
                 
                 % find min error of all clusters
-                temp_error = norm(ctrs(i,:)-real_pos);
-                if(temp_error <= real_error(n_clusters))
-                    real_error(n_clusters)=temp_error;
-                end  
-                
-            end 
+                power_cluster(i)= sum(selected_averages(cidx== i));
+                                
+%                 temp_error = norm(ctrs(i,:)-real_pos);
+%                 if(temp_error <= real_error(n_clusters))
+%                     real_error(n_clusters)=temp_error;
+%                 end  
+%                 
+            end
+%             find
+            real_error(n_clusters)=norm(ctrs(find(power_cluster==max(power_cluster)),:)- real_pos);
+%                 
+            
         end
         KMEANS_data(x_index, y_index).real_error = real_error;
         KMEANS_data(x_index, y_index).n_clusters = ...

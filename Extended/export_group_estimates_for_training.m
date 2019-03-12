@@ -253,6 +253,8 @@ for xloc = linspace(0,4,nPoints)%0:0.05:params.W
         % error=norm(estimatedLocation-[xloc yloc])
         
         %% Estimate position for emitter groups
+         %% combination of Ng emitter selected
+        
         Ng=3;
         
         % calculated de average value of the sum of recieved power for each
@@ -263,7 +265,7 @@ for xloc = linspace(0,4,nPoints)%0:0.05:params.W
         
         %select the emitter groups with power above average
         selected_emitters=find(average_power_sum >= mean(average_power_sum));
-        
+        selected_averages = average_power_sum(find(average_power_sum >= mean(average_power_sum)));
         %new emitter groups
         new_emitter_groups=emitter_groups(selected_emitters,:);
         
@@ -282,10 +284,11 @@ for xloc = linspace(0,4,nPoints)%0:0.05:params.W
             
             loc_combinations = [loc_combinations location];
         end
-%         loc_combinations= loc_combinations';
-        coordinates= loc_combinations';
+        loc_combinations= loc_combinations';
+        coordinates= loc_combinations;
         
         ground(round(xloc/step)+1,round(yloc/step)+1).coordinates = coordinates;
+        ground(round(xloc/step)+1,round(yloc/step)+1).coordinates_averages = selected_averages;
         ground(round(xloc/step)+1,round(yloc/step)+1).estimated_location = estimatedLocation;
         ground(round(xloc/step)+1,round(yloc/step)+1).xy = [xloc yloc];
         

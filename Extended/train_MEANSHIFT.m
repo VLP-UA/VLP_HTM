@@ -22,6 +22,7 @@ for x_index = x_index_array
     for y_index = y_index_array
         display(['X: '  num2str(x_index) ' Y:' num2str(y_index)]);
         coordinates=ground(x_index,y_index).coordinates;
+        selected_averages=ground(x_index,y_index).coordinates_averages;
         
         real_pos = ground(x_index,y_index).xy;
         estimated_pos = ground(x_index,y_index).estimated_location;
@@ -48,19 +49,21 @@ for x_index = x_index_array
             end
             
             real_error(bandwidth_index) = inf;
-            
-%             if size(clustCent,2) < 8
-                for i=1:size(clustCent,2)
-                    if( sum(data2cluster(data2cluster==i))/i >=3)
-                        temp_error = norm(clustCent(:,i)'-real_pos);
-                        
-                        if(temp_error <= real_error(bandwidth_index))
-                            real_error(bandwidth_index)=temp_error;
-                        end
-                    end
-                    
-                end
-%             end
+            power_cluster = [];
+            %             if size(clustCent,2) < 8
+            for i=1:size(clustCent,2)
+                %                     if( sum(data2cluster(data2cluster==i))/i >=3)
+                power_cluster(i) = sum(selected_averages(data2cluster == i));
+                %                         temp_error = norm(clustCent(:,i)'-real_pos);
+                %
+                %                         if(temp_error <= real_error(bandwidth_index))
+                %                             real_error(bandwidth_index)=temp_error;
+                %                         end
+                %                     end
+            end
+            %             end
+            max_power_index = find(power_cluster == max(power_cluster));
+            real_error(bandwidth_index)= norm(clustCent(:,max_power_index)' - real_pos);
             
             
         end
@@ -74,7 +77,7 @@ for x_index = x_index_array
     end
 end
 
-%% 
+%%
 min(min(reshape([MEANSHIFT_data(:).bandwidth_error],41,41)))
 mean(mean(reshape([MEANSHIFT_data(:).bandwidth_error],41,41)))
 max(max(reshape([MEANSHIFT_data(:).bandwidth_error],41,41)))
