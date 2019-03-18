@@ -451,7 +451,7 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         ground(round(xloc/step)+1,round(yloc/step)+1).dbscan_error_real = real_error_DBSCAN;
         ground(round(xloc/step)+1,round(yloc/step)+1).kmeans_error_real = real_error_KMEANS;
         ground(round(xloc/step)+1,round(yloc/step)+1).meanshift_error_real = real_error_MEANSHIFT;
-        
+        ground(round(xloc/step)+1,round(yloc/step)+1).noise = sum(sum(s));
         
     end
 end
