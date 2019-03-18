@@ -1,37 +1,3 @@
-%% test_robot_location
-clear
-close
-clc
-%%
-% % nonoise =1
-load('..\Clustering\epsilon_minPts_matrix_62_exp_4.mat')
-
-
-%%
-load('dbscan_data.mat');
-load('kmeans_data.mat');
-load('meanshift_data.mat');
-
-% add the path to the projective geometry functions
-addpath('../../ProjGeom');
-addpath('../');
-addpath('../Tests_Noise\')
-
-addpath('../Clustering\')
-
-plotOn = 0;
-group_overlap = 1;
-
-
-xloc =rand()*(params.W)
-yloc =  rand()*params.L
-
-Nm = params.Nm;
-Np = params.Np;
-
-Psi=params.Psi;
-
-
 %% Create the light emitters
 
 Emitters = newEmitters(params.n_Emitters,params.Pb,params.Ps,params.m);
@@ -125,8 +91,9 @@ Z_p = 100e6*nRec_v;      % PD equivalent impedace = 100 MOhm
 
 % tempSensor will be modified when travelling the room floor
 tempSensor = PDSensor;
-step=0.1;
-nPoints= (params.W/step)+1;
+
+% nPoints= (params.W/step)+1;
+step=params.W/(nPoints-1);
 
 
 
@@ -216,7 +183,11 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
             accepted=zeros(1,params.n_Emitters);
             mrecP = mean(recP);
             while(sum(accepted) <4)
-                accepted = recP > mrecP;
+                if(trilat_filter)
+                    accepted = recP > mrecP;
+                else
+                    accepted = recP > mrecP| 1==1;
+                end
                 mrecP = 0.98*mrecP;
             end
             
@@ -281,7 +252,7 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         %interpolate data for epsilon and minPts
         
         
-        epsilon = DBSCAN_data(round(xloc/step)+1,round(yloc/step)+1).best_epsilon;
+        epsilon = DBSCAN_data(round(xloc/step1)+1,round(yloc/step1)+1).best_epsilon;
         IDX=DBSCAN(coordinates,epsilon,3);
         
         
@@ -301,51 +272,56 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         
         smallest_error_DBSCAN = inf;
         smallest_error_DBSCAN_index=0;
-
+        
         cluster_power = [];
-        for index=1:max(IDX)
-            %calculate the center position of each cluster
-            cluster_power(index)=sum(selected_averages(IDX==index));
-
-            
-            temp=mean(coordinates(IDX==index,:),1);
-            estimated_error_DBSCAN = norm(temp -estimatedLocation);
-
-            % find cluster with smallest error
-            if estimated_error_DBSCAN <= smallest_error_DBSCAN
-                smallest_error_DBSCAN = estimated_error_DBSCAN;
-                smallest_error_DBSCAN_index = index;
-            end
-
-            
-            if plotOn
-                plot(temp(1), temp(2),'*k');
-                hold on
-            end
-            
-        end
-        if max(IDX)== 0 
+        
+        if max(IDX)== 0
             cluster_power(1)=sum(selected_averages(IDX==0));
+            
+            temp1=mean(coordinates(find(IDX == 0),:),1);
+        else
+            for index=1:max(IDX)
+                %calculate the center position of each cluster
+                cluster_power(index)=sum(selected_averages(IDX==index));
+                
+                
+                temp=mean(coordinates(IDX==index,:),1);
+                estimated_error_DBSCAN = norm(temp -estimatedLocation);
+                
+                % find cluster with smallest error
+                if estimated_error_DBSCAN <= smallest_error_DBSCAN
+                    smallest_error_DBSCAN = estimated_error_DBSCAN;
+                    smallest_error_DBSCAN_index = index;
+                end
+                
+                
+                if plotOn
+                    plot(temp(1), temp(2),'*k');
+                    hold on
+                end
+                
+            end
+            max_cluster_power_index=find(cluster_power==max(cluster_power));
+            temp1=mean(coordinates(find(IDX == max_cluster_power_index),:),1);
         end
         
-        real_error_DBSCAN = norm(mean(coordinates(find(IDX == smallest_error_DBSCAN_index))) - [xloc yloc]); 
-
-        max_cluster_power_index=find(cluster_power==max(cluster_power));
+        real_error_DBSCAN = norm(mean(coordinates(find(IDX == smallest_error_DBSCAN_index))) - [xloc yloc]);
+        
+        
         temp=mean(coordinates(find(IDX == max_cluster_power_index),:),1);
         estimated_error_DBSCAN = norm(temp - estimatedLocation);
         
-        temp=mean(coordinates(find(IDX == max_cluster_power_index),:),1);
-        real_error_DBSCAN = norm(temp - [xloc yloc]);
+        real_error_DBSCAN = norm(temp1 - [xloc yloc]);
         
-%         if real_error_DBSCAN_1 < real_error_DBSCAN
-%             real_error_DBSCAN = real_error_DBSCAN_1;
-%         end
+        %         if real_error_DBSCAN_1 < real_error_DBSCAN
+        %             real_error_DBSCAN = real_error_DBSCAN_1;
+        %         end
         
         
         
         %% Run K MEANS
         
-        n_clusters = KMEANS_data(round(xloc/step)+1, round(yloc/step)+1).n_clusters;
+        n_clusters = KMEANS_data(round(xloc/step1)+1, round(yloc/step1)+1).n_clusters;
         
         opts = statset('Display','off');
         [cidx, ctrs] = kmeans(coordinates, n_clusters, 'Distance','city', ...
@@ -360,7 +336,7 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
             end
             
             cluster_power(i)=sum(selected_averages(cidx==i));
-%             % find min error of all clusters
+            %             % find min error of all clusters
             temp_error = norm(ctrs(i,:)-estimatedLocation);
             if(temp_error <= estimated_error_kmeans)
                 estimated_error_kmeans=temp_error;
@@ -369,12 +345,12 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
             
         end
         
-         real_error_KMEANS = norm(ctrs(estimated_error_kmeans_cluster,:) - [xloc yloc]);
-
-       
-%         for index=1:max(n_clusters)
-%             cluster_power(index)=sum(selected_averages(cidx==index));
-%         end
+        real_error_KMEANS = norm(ctrs(estimated_error_kmeans_cluster,:) - [xloc yloc]);
+        
+        
+        %         for index=1:max(n_clusters)
+        %             cluster_power(index)=sum(selected_averages(cidx==index));
+        %         end
         max_cluster_power_index=find(cluster_power==max(cluster_power));
         
         
@@ -382,15 +358,15 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         
         real_error_KMEANS = norm(ctrs(max_cluster_power_index,:) - [xloc yloc]);
         
-%         if( real_error_KMEANS_1 < real_error_KMEANS)
-%             real_error_KMEANS =  real_error_KMEANS_1;
-%         end
+        %         if( real_error_KMEANS_1 < real_error_KMEANS)
+        %             real_error_KMEANS =  real_error_KMEANS_1;
+        %         end
         
         %% Run MEAN SHIFT
         plotFlag=false;
         bandWidth = 0.1;
         
-        bandwidth=MEANSHIFT_data(round(xloc/step)+1,round(yloc/step)+1).bandwidth;
+        bandwidth=MEANSHIFT_data(round(xloc/step1)+1,round(yloc/step1)+1).bandwidth;
         
         [clustCent,data2cluster,cluster2dataCell] = ...
             MeanShiftCluster(coordinates',bandwidth,plotFlag);
@@ -414,17 +390,17 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         cluster_power = [];
         
         for i=1:size(clustCent,2)
-%             if( sum(data2cluster(data2cluster==i))/i >=2)
-                cluster_power(i)=sum(selected_averages(data2cluster==i));
-                
-                
-                temp_error = norm(clustCent(:,i)'- estimatedLocation);
-                
-                if(temp_error <= estimated_error_meanshift)
-                    estimated_error_meanshift = temp_error;
-                    estimated_error_meanshift_cluster=i;
-                end
-%             end
+            %             if( sum(data2cluster(data2cluster==i))/i >=2)
+            cluster_power(i)=sum(selected_averages(data2cluster==i));
+            
+            
+            temp_error = norm(clustCent(:,i)'- estimatedLocation);
+            
+            if(temp_error <= estimated_error_meanshift)
+                estimated_error_meanshift = temp_error;
+                estimated_error_meanshift_cluster=i;
+            end
+            %             end
             
         end
         
@@ -432,25 +408,26 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         estimated_error_MEANSHIFT = norm(clustCent(:,max_cluster_power_index)' -estimatedLocation);
         
         real_error_MEANSHIFT = norm(clustCent(:,estimated_error_meanshift_cluster)' - [xloc yloc]);
-
+        
         
         real_error_MEANSHIFT = norm(clustCent(:,max_cluster_power_index)' - [xloc yloc]);
         
-%         if real_error_MEANSHIFT_1 < real_error_MEANSHIFT
-%             real_error_MEANSHIFT =  real_error_MEANSHIFT_1;
-%         end
+        %         if real_error_MEANSHIFT_1 < real_error_MEANSHIFT
+        %             real_error_MEANSHIFT =  real_error_MEANSHIFT_1;
+        %         end
         
         %%
         
         ground(round(xloc/step)+1,round(yloc/step)+1).trilat_error = trilat_error;
-        ground(round(xloc/step)+1,round(yloc/step)+1).dbscan_error = smallest_error_DBSCAN;
-        ground(round(xloc/step)+1,round(yloc/step)+1).kmeans_error = estimated_error_kmeans;
-        ground(round(xloc/step)+1,round(yloc/step)+1).meanshift_error = estimated_error_meanshift;
-        
-        
+%         ground(round(xloc/step)+1,round(yloc/step)+1).dbscan_error = smallest_error_DBSCAN;
+%         ground(round(xloc/step)+1,round(yloc/step)+1).kmeans_error = estimated_error_kmeans;
+%         ground(round(xloc/step)+1,round(yloc/step)+1).meanshift_error = estimated_error_meanshift;
+%         
+%         
         ground(round(xloc/step)+1,round(yloc/step)+1).dbscan_error_real = real_error_DBSCAN;
         ground(round(xloc/step)+1,round(yloc/step)+1).kmeans_error_real = real_error_KMEANS;
         ground(round(xloc/step)+1,round(yloc/step)+1).meanshift_error_real = real_error_MEANSHIFT;
+        
         ground(round(xloc/step)+1,round(yloc/step)+1).noise = sum(sum(s));
         
     end
@@ -459,93 +436,13 @@ end
 %%
 
 mean_trilat_error = mean(mean(reshape([ground(:,:).trilat_error],nPoints,nPoints)));
-mean_dbscan_error = mean(mean(reshape([ground(:,:).dbscan_error],nPoints,nPoints)));
-mean_kmeans_error = mean(mean(reshape([ground(:,:).kmeans_error],nPoints,nPoints)));
-mean_meanshift_error = mean(mean(reshape([ground(:,:).meanshift_error],nPoints,nPoints)));
+% mean_dbscan_error = mean(mean(reshape([ground(:,:).dbscan_error],nPoints,nPoints)));
+% mean_kmeans_error = mean(mean(reshape([ground(:,:).kmeans_error],nPoints,nPoints)));
+% mean_meanshift_error = mean(mean(reshape([ground(:,:).meanshift_error],nPoints,nPoints)));
 
 mean_dbscan_error_real = mean(mean(reshape([ground(:,:).dbscan_error_real],nPoints,nPoints)));
 mean_kmeans_error_real = mean(mean(reshape([ground(:,:).kmeans_error_real],nPoints,nPoints)));
 mean_meanshift_error_real = mean(mean(reshape([ground(:,:).meanshift_error_real],nPoints,nPoints)));
-
-% save(ground)
-threshold_level=0.05
-
-trilat_points=reshape([ground(:,:).trilat_error],nPoints,nPoints);
-trilat_plot= trilat_points;
-trilat_points(find(trilat_points > threshold_level))=1;
-count_trilat=sum(trilat_points(find(trilat_points > threshold_level)));
-trilat_points(find(trilat_points > threshold_level))=inf;
-
-subplot(1,4,1)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),trilat_plot)
-title(['Trilateration error : ' num2str((1681-count_trilat)/(1681))])
-xlabel('X(m)')
-ylabel('Y(m)')
-% colormap('jet')
-colorbar
-caxis([0 threshold_level])
-shading interp
-axis square
-view(0,90)
-
-dbscan_points=reshape([ground(:,:).dbscan_error_real],nPoints,nPoints);
-dbscan_plot= dbscan_points;
-dbscan_points(find(dbscan_points > threshold_level))=1;
-count_dbscan=sum(dbscan_points(find(dbscan_points > threshold_level)));
-dbscan_points(find(dbscan_points > threshold_level))=inf;
-
-subplot(1,4,2)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),dbscan_plot)
-title(['DBSCAN error : ' num2str((1681-count_dbscan)/(1681))])
-xlabel('X(m)')
-ylabel('Y(m)')
-% colormap('jet')
-colorbar
-caxis([0 threshold_level])
-shading interp
-axis square
-view(0,90)
-
-
-kmeans_points=reshape([ground(:,:).kmeans_error_real],nPoints,nPoints);
-kmeans_plot=kmeans_points;
-kmeans_points(find(kmeans_points > threshold_level))=1;
-count_kmeans=sum(kmeans_points(find(kmeans_points > threshold_level)));
-kmeans_points(find(kmeans_points > threshold_level))=inf;
-
-subplot(1,4,3)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),kmeans_plot)
-title(['KMEANS error : ' num2str((1681-count_kmeans)/1681)])
-xlabel('X(m)')
-ylabel('Y(m)')
-% colormap('jet')
-colorbar
-caxis([0 threshold_level])
-shading interp
-axis square
-view(0,90)
-
-meanshift_points=reshape([ground(:,:).meanshift_error_real],nPoints,nPoints);
-meanshift_plot=meanshift_points;
-meanshift_points(find(meanshift_points > threshold_level))= 1;
-count_meanshift=sum(meanshift_points(find(meanshift_points > threshold_level)));
-meanshift_points(find(meanshift_points > threshold_level))=inf;
-
-
-
-subplot(1,4,4)
-surf(linspace(0,4,nPoints),linspace(0,4,nPoints),meanshift_plot)
-title(['MEANSHIFT error : ' num2str((1681-count_meanshift)/1681)])
-xlabel('X(m)')
-ylabel('Y(m)')
-% colormap('jet')
-colorbar
-caxis([0 threshold_level])
-shading interp
-axis square
-view(0,90)
-
-save('ground', 'ground');
 
 
 
