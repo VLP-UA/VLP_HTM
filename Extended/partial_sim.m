@@ -91,8 +91,9 @@ Z_p = 100e6*nRec_v;      % PD equivalent impedace = 100 MOhm
 
 % tempSensor will be modified when travelling the room floor
 tempSensor = PDSensor;
-step=0.1;
-nPoints= (params.W/step)+1;
+
+% nPoints= (params.W/step)+1;
+step=params.W/(nPoints-1);
 
 
 
@@ -182,7 +183,11 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
             accepted=zeros(1,params.n_Emitters);
             mrecP = mean(recP);
             while(sum(accepted) <4)
-                accepted = recP > mrecP;
+                if(trilat_filter)
+                    accepted = recP > mrecP;
+                else
+                    accepted = recP > mrecP| 1==1;
+                end
                 mrecP = 0.98*mrecP;
             end
             
@@ -247,7 +252,7 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         %interpolate data for epsilon and minPts
         
         
-        epsilon = DBSCAN_data(round(xloc/step)+1,round(yloc/step)+1).best_epsilon;
+        epsilon = DBSCAN_data(round(xloc/step1)+1,round(yloc/step1)+1).best_epsilon;
         IDX=DBSCAN(coordinates,epsilon,3);
         
         
@@ -316,7 +321,7 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         
         %% Run K MEANS
         
-        n_clusters = KMEANS_data(round(xloc/step)+1, round(yloc/step)+1).n_clusters;
+        n_clusters = KMEANS_data(round(xloc/step1)+1, round(yloc/step1)+1).n_clusters;
         
         opts = statset('Display','off');
         [cidx, ctrs] = kmeans(coordinates, n_clusters, 'Distance','city', ...
@@ -361,7 +366,7 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         plotFlag=false;
         bandWidth = 0.1;
         
-        bandwidth=MEANSHIFT_data(round(xloc/step)+1,round(yloc/step)+1).bandwidth;
+        bandwidth=MEANSHIFT_data(round(xloc/step1)+1,round(yloc/step1)+1).bandwidth;
         
         [clustCent,data2cluster,cluster2dataCell] = ...
             MeanShiftCluster(coordinates',bandwidth,plotFlag);
@@ -423,6 +428,7 @@ for xloc = linspace(0,params.W,nPoints)%0:0.05:params.W
         ground(round(xloc/step)+1,round(yloc/step)+1).kmeans_error_real = real_error_KMEANS;
         ground(round(xloc/step)+1,round(yloc/step)+1).meanshift_error_real = real_error_MEANSHIFT;
         
+        ground(round(xloc/step)+1,round(yloc/step)+1).noise = sum(sum(s));
         
     end
 end
@@ -430,9 +436,9 @@ end
 %%
 
 mean_trilat_error = mean(mean(reshape([ground(:,:).trilat_error],nPoints,nPoints)));
-mean_dbscan_error = mean(mean(reshape([ground(:,:).dbscan_error],nPoints,nPoints)));
-mean_kmeans_error = mean(mean(reshape([ground(:,:).kmeans_error],nPoints,nPoints)));
-mean_meanshift_error = mean(mean(reshape([ground(:,:).meanshift_error],nPoints,nPoints)));
+% mean_dbscan_error = mean(mean(reshape([ground(:,:).dbscan_error],nPoints,nPoints)));
+% mean_kmeans_error = mean(mean(reshape([ground(:,:).kmeans_error],nPoints,nPoints)));
+% mean_meanshift_error = mean(mean(reshape([ground(:,:).meanshift_error],nPoints,nPoints)));
 
 mean_dbscan_error_real = mean(mean(reshape([ground(:,:).dbscan_error_real],nPoints,nPoints)));
 mean_kmeans_error_real = mean(mean(reshape([ground(:,:).kmeans_error_real],nPoints,nPoints)));
